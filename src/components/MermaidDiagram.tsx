@@ -18,7 +18,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ chart, className
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'strict',
-          theme: 'neutral',
+          theme: 'dark',
         });
 
         const renderId = `repo-architecture-${Math.random().toString(36).slice(2)}`;

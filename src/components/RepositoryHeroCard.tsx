@@ -18,7 +18,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
 }) => {
   const { repo, latestRelease } = data;
   const [copiedClone, setCopiedClone] = useState(false);
-  const [diagramView, setDiagramView] = useState<'mermaid' | 'web'>('mermaid');
+  const [diagramView, setDiagramView] = useState<'mermaid' | 'web'>('web');
 
   const architectureDiagram = useMemo(
     () => generateDefaultUmlDiagram(data),

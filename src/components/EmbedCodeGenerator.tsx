@@ -176,7 +176,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 export function GitHubRepoCard({ renderWebArchitecture } = {}) {
   const data = ${serializedData};
-  const [activeDiagram, setActiveDiagram] = useState('mermaid');
+  const [activeDiagram, setActiveDiagram] = useState('web');
   const [mermaidError, setMermaidError] = useState('');
   const mermaidContainerRef = useRef(null);
 
@@ -188,7 +188,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       if (!mermaidContainerRef.current) return;
       try {
         const mermaid = (await import('mermaid')).default;
-        mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'neutral' });
+        mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'dark' });
         const renderId = 'repo-card-diagram-' + Math.random().toString(36).slice(2);
         const { svg } = await mermaid.render(renderId, data.diagrams.mermaidCode);
         if (!cancelled && mermaidContainerRef.current) {
@@ -806,7 +806,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
     buttons.forEach(function (btn) {
       btn.addEventListener('click', function () { setActive(btn.getAttribute('data-diagram-tab')); });
     });
-    setActive('mermaid');
+    setActive('web');
   }
 
   function renderMermaid(el, code) {
@@ -819,7 +819,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       return;
     }
     try {
-      window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'neutral' });
+      window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'dark' });
       var renderId = 'repo-card-mermaid-' + Math.random().toString(36).slice(2);
       window.mermaid.render(renderId, code).then(function (result) {
         container.innerHTML = result.svg;
@@ -1372,7 +1372,7 @@ ${js}
     }
 
     function RepoCard() {
-      const [activeDiagram, setActiveDiagram] = useState('mermaid');
+      const [activeDiagram, setActiveDiagram] = useState('web');
       const [mermaidError, setMermaidError] = useState('');
       const mermaidContainerRef = useRef(null);
 
@@ -1387,7 +1387,7 @@ ${js}
         }
 
         try {
-          window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'neutral' });
+          window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'dark' });
           const renderId = 'hybrid-mermaid-' + Math.random().toString(36).slice(2);
           window.mermaid.render(renderId, data.diagrams.mermaidCode).then((result) => {
             if (!mermaidContainerRef.current) return;
