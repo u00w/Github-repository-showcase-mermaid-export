@@ -8,7 +8,7 @@ interface EmbedCodeGeneratorProps {
   activeTheme: ThemeStyle;
 }
 
-type EmbedType = 'iframe' | 'react' | 'tailwind' | 'markdown' | 'html' | 'css' | 'javascript' | 'combined';
+type EmbedType = 'iframe' | 'react' | 'tailwind' | 'markdown' | 'html' | 'css' | 'javascript' | 'combined' | 'hybrid';
 
 // Safely escape a string for use inside HTML attribute values (double-quoted)
 function escAttr(value: string): string {
@@ -489,7 +489,21 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 .repo-card__diagram-pane.is-hidden { display: none; }
 .repo-card__diagram-mermaid { overflow-x: auto; background: #fff; color: #0f172a; border-radius: 8px; padding: 8px; }
 .repo-card__web-diagram { width: 100%; overflow-x: auto; }
-.repo-card__web-svg { width: 100%; min-width: 560px; height: 340px; display: block; }
+.repo-card__web-shell { border: 1px solid #334155; border-radius: 10px; background: rgba(2, 6, 23, 0.75); overflow: hidden; }
+.repo-card__web-legend { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 10px; color: #94a3b8; }
+.repo-card__web-legend-dot { width: 8px; height: 8px; border-radius: 999px; background: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+.repo-card__web-frame { width: 100%; overflow-x: auto; }
+.repo-card__web-canvas { position: relative; width: 1240px; }
+.repo-card__web-lanes { position: absolute; left: 0; right: 0; top: 6px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 0 20px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #475569; z-index: 3; }
+.repo-card__web-svg { position: absolute; inset: 0; width: 1240px; pointer-events: none; z-index: 1; }
+.repo-card__web-node { position: absolute; width: 208px; transform: translate(-50%, -50%); border-radius: 10px; border: 1px solid rgba(129, 140, 248, 0.35); background: rgba(15, 23, 42, 0.95); box-shadow: 0 8px 20px rgba(2, 6, 23, 0.45); color: #e2e8f0; text-decoration: none; overflow: hidden; z-index: 2; transition: border-color 0.15s ease, background 0.15s ease; }
+.repo-card__web-node:hover { border-color: rgba(129, 140, 248, 0.75); background: rgba(30, 41, 59, 0.95); z-index: 4; }
+.repo-card__web-node-stereo { margin: 0; padding: 8px 10px 0; font-size: 9px; text-transform: uppercase; letter-spacing: 0.09em; color: #a5b4fc; }
+.repo-card__web-node-title { display: flex; align-items: center; gap: 6px; margin-top: 4px; padding: 8px 10px; border-top: 1px solid rgba(71, 85, 105, 0.8); border-bottom: 1px solid rgba(71, 85, 105, 0.8); }
+.repo-card__web-node-name { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; font-weight: 700; color: #e0e7ff; }
+.repo-card__web-node-link { font-size: 10px; color: #64748b; }
+.repo-card__web-node-members { padding: 8px 10px 10px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 9px; line-height: 1.35; color: #cbd5e1; display: grid; gap: 2px; }
+.repo-card__web-node-member { margin: 0; word-break: break-word; }
 .repo-card__diagram-error { margin: 0 0 8px; color: #fecdd3; font-size: 11px; }
 .repo-card__language-list { display: flex; flex-direction: column; gap: 8px; }
 .repo-card__language-row { display: flex; justify-content: space-between; font-size: 11px; color: #cbd5e1; margin-bottom: 4px; }
@@ -524,6 +538,15 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 .repo-card--light .repo-card__contributor-count,
 .repo-card--light .repo-card__language-row { color: #64748b; }
 .repo-card--light .repo-card__diagram-mermaid { border: 1px solid #cbd5e1; }
+.repo-card--light .repo-card__web-shell { background: #f8fafc; border-color: #cbd5e1; }
+.repo-card--light .repo-card__web-legend { border-color: #e2e8f0; color: #64748b; }
+.repo-card--light .repo-card__web-lanes { color: #94a3b8; }
+.repo-card--light .repo-card__web-node { background: #ffffff; border-color: rgba(99, 102, 241, 0.35); box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08); }
+.repo-card--light .repo-card__web-node:hover { background: #f8fafc; }
+.repo-card--light .repo-card__web-node-stereo { color: #4f46e5; }
+.repo-card--light .repo-card__web-node-name { color: #1e293b; }
+.repo-card--light .repo-card__web-node-link { color: #64748b; }
+.repo-card--light .repo-card__web-node-members { color: #334155; }
 .repo-card--light .repo-card__tree { color: #334155; }
 .repo-card--light .repo-card__contributor { background: #f8fafc; border-color: #cbd5e1; }
 .repo-card--light .repo-card__top-link { color: #1d4ed8; }
@@ -623,7 +646,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
     var container = el.querySelector('[data-web-container]');
     if (!container) return;
 
-    var classes = (data.diagrams && data.diagrams.classes ? data.diagrams.classes : []).slice(0, 8);
+    var classes = (data.diagrams && data.diagrams.classes ? data.diagrams.classes : []).slice(0, 14);
     var relationships = data.diagrams && data.diagrams.relationships ? data.diagrams.relationships : [];
 
     if (!classes.length) {
@@ -631,40 +654,126 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       return;
     }
 
-    var cols = 4;
-    var xGap = 160;
-    var yGap = 120;
-    var startX = 80;
-    var startY = 70;
-    var posById = {};
+    var groups = [
+      { name: 'Input & menus', match: /menu|ui|input|hud|screen|panel|button|view|camera/i },
+      { name: 'Managers & systems', match: /manager|controller|game|simulation|service|system|state/i },
+      { name: 'World & roads', match: /road|world|map|terrain|vehicle|traffic|path|location/i },
+      { name: 'Data & support', match: /model|data|config|repository|save|event|player/i },
+    ];
+    var laneX = [0.12, 0.38, 0.64, 0.88];
+    var nodeWidth = 208;
+    var canvasWidth = 1240;
 
-    classes.forEach(function (cls, index) {
-      var col = index % cols;
-      var row = Math.floor(index / cols);
-      posById[cls.id] = { x: startX + col * xGap, y: startY + row * yGap };
+    function estimateHeight(cls) {
+      var memberLines = (cls.attributes || []).length + (cls.methods || []).length;
+      return Math.max(82, 54 + memberLines * 12);
+    }
+
+    function groupIndex(cls) {
+      var descriptor = [cls.name, cls.packageName || '', cls.stereotype || ''].join(' ');
+      for (var i = 0; i < groups.length; i += 1) {
+        if (groups[i].match.test(descriptor)) return i;
+      }
+      return groups.length - 1;
+    }
+
+    function relationStyle(rel) {
+      var name = String(rel.label || rel.type || '').toLowerCase();
+      if (name.indexOf('uses') >= 0) return { color: '#facc15', bg: '#422006', border: '#facc15' };
+      if (name.indexOf('manages') >= 0) return { color: '#4ade80', bg: '#052e16', border: '#4ade80' };
+      if (name.indexOf('reads') >= 0) return { color: '#c084fc', bg: '#3b0764', border: '#c084fc' };
+      return { color: '#818cf8', bg: '#0f172a', border: '#475569' };
+    }
+
+    function orthPath(from, to, routeIndex) {
+      var leftToRight = to.x >= from.x;
+      var startX = from.x + (leftToRight ? nodeWidth / 2 : -nodeWidth / 2);
+      var endX = to.x + (leftToRight ? -nodeWidth / 2 : nodeWidth / 2);
+      var startY = from.y + ((routeIndex % 7) - 3) * 4;
+      var endY = to.y + (((routeIndex * 3) % 7) - 3) * 4;
+      var dir = leftToRight ? 1 : -1;
+      var requested = 44 + (routeIndex % 7) * 18;
+      var available = Math.max(26, Math.abs(endX - startX) / 2 - 12);
+      var midX = startX + dir * Math.min(requested, available);
+      var vertDir = endY >= startY ? 1 : -1;
+      var radius = Math.min(12, Math.abs(endY - startY) / 2, Math.abs(endX - startX) / 4);
+      var beforeTurn = midX - dir * radius;
+      var afterTurn = midX + dir * radius;
+      return {
+        d: [
+          'M ' + startX + ' ' + startY,
+          'H ' + beforeTurn,
+          'Q ' + midX + ' ' + startY + ' ' + midX + ' ' + (startY + vertDir * radius),
+          'V ' + (endY - vertDir * radius),
+          'Q ' + midX + ' ' + endY + ' ' + afterTurn + ' ' + endY,
+          'H ' + endX,
+        ].join(' '),
+        labelX: midX + dir * 5,
+        labelY: (startY + endY) / 2 - 7,
+      };
+    }
+
+    var lanes = [[], [], [], []];
+    classes.forEach(function (cls) {
+      lanes[groupIndex(cls)].push(cls);
     });
 
-    var edgeSvg = relationships
-      .filter(function (rel) { return posById[rel.fromId] && posById[rel.toId]; })
-      .map(function (rel) {
-        var from = posById[rel.fromId];
-        var to = posById[rel.toId];
-        return '<line x1="' + from.x + '" y1="' + from.y + '" x2="' + to.x + '" y2="' + to.y + '" stroke="#475569" stroke-width="2" />';
+    var positions = {};
+    var maxY = 640;
+    lanes.forEach(function (lane, idx) {
+      var y = 64;
+      lane.forEach(function (cls) {
+        var h = estimateHeight(cls);
+        positions[cls.id] = { x: laneX[idx] * canvasWidth, y: y + h / 2, height: h };
+        y += h + 30;
+      });
+      maxY = Math.max(maxY, y + 50);
+    });
+
+    var links = relationships
+      .filter(function (rel) { return positions[rel.fromId] && positions[rel.toId]; })
+      .map(function (rel, idx) {
+        var route = orthPath(positions[rel.fromId], positions[rel.toId], idx);
+        var style = relationStyle(rel);
+        var label = esc(rel.label || rel.type || 'relation');
+        var dashed = rel.type === 'dependency' || rel.type === 'realization';
+        var boxW = label.length * 5.8 + 12;
+        return '<g>' +
+          '<path d="' + route.d + '" fill="none" stroke="#020617" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>' +
+          '<path d="' + route.d + '" fill="none" stroke="' + style.color + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"' + (dashed ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#repo-card-arch-arrow)"></path>' +
+          '<rect x="' + (route.labelX - boxW / 2) + '" y="' + (route.labelY - 7) + '" width="' + boxW + '" height="14" rx="4" fill="' + style.bg + '" stroke="' + style.border + '"></rect>' +
+          '<text x="' + route.labelX + '" y="' + route.labelY + '" text-anchor="middle" dominant-baseline="middle" fill="#e2e8f0" font-size="9">' + label + '</text>' +
+        '</g>';
       })
       .join('');
 
-    var nodeSvg = classes.map(function (cls) {
-      var pos = posById[cls.id];
-      var label = esc(cls.name);
-      var tooltip = esc((cls.stereotype || 'class') + ' · ' + (cls.packageName || 'root'));
-      return '<g>' +
-        '<title>' + tooltip + '</title>' +
-        '<circle cx="' + pos.x + '" cy="' + pos.y + '" r="24" fill="#312e81" stroke="#818cf8" stroke-width="2"></circle>' +
-        '<text x="' + pos.x + '" y="' + (pos.y + 44) + '" fill="#cbd5e1" text-anchor="middle" font-size="10">' + label + '</text>' +
-      '</g>';
+    var cards = classes.map(function (cls) {
+      var pos = positions[cls.id];
+      var members = [];
+      (cls.attributes || []).forEach(function (a) { members.push('<p class="repo-card__web-node-member">' + esc(a) + '</p>'); });
+      (cls.methods || []).forEach(function (m) { members.push('<p class="repo-card__web-node-member">' + esc(m) + '</p>'); });
+      var href = 'https://github.com/' + data.repo.fullName + '/search?q=' + encodeURIComponent(cls.name) + '&type=code';
+      return '<a class="repo-card__web-node" href="' + href + '" target="_blank" rel="noopener noreferrer" title="Find ' + esc(cls.name) + ' in this repository on GitHub" style="left:' + pos.x + 'px;top:' + pos.y + 'px;height:' + pos.height + 'px;">' +
+        '<p class="repo-card__web-node-stereo">«' + esc(cls.stereotype || 'class') + '»</p>' +
+        '<div class="repo-card__web-node-title"><span class="repo-card__web-node-name">' + esc(cls.name) + '</span><span class="repo-card__web-node-link">↗</span></div>' +
+        (members.length ? '<div class="repo-card__web-node-members">' + members.join('') + '</div>' : '') +
+      '</a>';
     }).join('');
 
-    container.innerHTML = '<svg class="repo-card__web-svg" viewBox="0 0 760 340" role="img" aria-label="Interactive architecture diagram">' + edgeSvg + nodeSvg + '</svg>';
+    container.innerHTML =
+      '<div class="repo-card__web-shell">' +
+        '<div class="repo-card__web-legend"><span class="repo-card__web-legend-dot"></span><span>Modules are clustered by concern, with labeled UML relationships between lanes.</span></div>' +
+        '<div class="repo-card__web-frame">' +
+          '<div class="repo-card__web-canvas" style="height:' + maxY + 'px;">' +
+            '<div class="repo-card__web-lanes">' + groups.map(function (g) { return '<span>' + esc(g.name) + '</span>'; }).join('') + '</div>' +
+            '<svg class="repo-card__web-svg" width="' + canvasWidth + '" height="' + maxY + '" aria-hidden="true">' +
+              '<defs><marker id="repo-card-arch-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="context-stroke"></path></marker></defs>' +
+              links +
+            '</svg>' +
+            cards +
+          '</div>' +
+        '</div>' +
+      '</div>';
   }
 
   function bindDiagramUi(el, data) {
@@ -864,6 +973,266 @@ ${js}
 </html>`;
   };
 
+  const getHybridCode = () => {
+    const hybridData = getExportCardData();
+    const serializedData = JSON.stringify(hybridData, null, 2);
+    return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${escHtml(repo.full_name)} — Hybrid Architecture Widget</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="min-h-screen bg-slate-950 p-6">
+  <div class="max-w-7xl mx-auto space-y-4">
+    <h1 class="text-slate-100 font-semibold text-sm">Hybrid Web Architecture Export</h1>
+    <p class="text-slate-400 text-xs">This hybrid snippet uses React runtime + Babel to render the architecture view with the same lane and connector logic as the in-app diagram.</p>
+    <div id="repo-web-diagram"></div>
+  </div>
+
+  <script type="text/babel">
+    const { useLayoutEffect, useMemo, useRef, useState } = React;
+    const data = ${serializedData};
+
+    const GROUPS = [
+      { name: 'Input & menus', match: /menu|ui|input|hud|screen|panel|button|view|camera/i },
+      { name: 'Managers & systems', match: /manager|controller|game|simulation|service|system|state/i },
+      { name: 'World & roads', match: /road|world|map|terrain|vehicle|traffic|path|location/i },
+      { name: 'Data & support', match: /model|data|config|repository|save|event|player/i },
+    ];
+    const GROUP_X_POSITIONS = [0.08, 0.36, 0.64, 0.92];
+
+    const getGroupIndex = (umlClass) => {
+      const descriptor = umlClass.name + ' ' + (umlClass.packageName || '') + ' ' + (umlClass.stereotype || '');
+      return GROUPS.findIndex((group) => group.match.test(descriptor));
+    };
+
+    const estimateNodeHeight = (umlClass) => {
+      const members = [...(umlClass.attributes || []), ...(umlClass.methods || [])];
+      const textLines = members.reduce((total, member) => total + Math.max(1, Math.ceil(String(member).length / 27)), 0);
+      return 58 + textLines * 15;
+    };
+
+    const getClusteredLayout = (classes) => {
+      const clusters = GROUPS.map(() => []);
+      const other = [];
+      classes.forEach((umlClass) => {
+        const index = getGroupIndex(umlClass);
+        if (index === -1) other.push(umlClass);
+        else clusters[index].push(umlClass);
+      });
+
+      clusters[3].push(...other);
+      const tallestCluster = Math.max(...clusters.map((cluster) => cluster.reduce((total, umlClass) => total + estimateNodeHeight(umlClass) + 30, 0)));
+      const canvasHeight = Math.max(640, tallestCluster + 110);
+      const positions = {};
+
+      clusters.forEach((cluster, groupIndex) => {
+        let cursorY = 64;
+        cluster.forEach((umlClass) => {
+          const nodeHeight = estimateNodeHeight(umlClass);
+          positions[umlClass.id] = {
+            x: GROUP_X_POSITIONS[groupIndex],
+            y: cursorY + nodeHeight / 2,
+          };
+          cursorY += nodeHeight + 30;
+        });
+      });
+
+      return { positions, canvasHeight };
+    };
+
+    const getRelationStyle = (relationship) => {
+      const name = String(relationship.label || relationship.type).toLowerCase();
+      if (name.includes('uses')) return { color: '#facc15', labelBackground: '#422006', labelBorder: '#facc15' };
+      if (name.includes('manages')) return { color: '#4ade80', labelBackground: '#052e16', labelBorder: '#4ade80' };
+      if (name.includes('reads')) return { color: '#c084fc', labelBackground: '#3b0764', labelBorder: '#c084fc' };
+      return { color: '#818cf8', labelBackground: '#0f172a', labelBorder: '#475569' };
+    };
+
+    const createOrthogonalPath = (source, target, routeIndex) => {
+      const sourceCenter = { x: source.x, y: source.y };
+      const targetCenter = { x: target.x, y: target.y };
+      const sourcePortOffset = ((routeIndex % 7) - 3) * 5;
+      const targetPortOffset = (((routeIndex * 3) % 7) - 3) * 5;
+      const isSameLane = Math.abs(targetCenter.x - sourceCenter.x) < 30;
+      const leftToRight = isSameLane ? routeIndex % 2 === 0 : targetCenter.x >= sourceCenter.x;
+      const start = {
+        x: sourceCenter.x + (leftToRight ? source.width / 2 : -source.width / 2),
+        y: sourceCenter.y + sourcePortOffset,
+      };
+      const end = {
+        x: targetCenter.x + (leftToRight ? -target.width / 2 : target.width / 2),
+        y: targetCenter.y + targetPortOffset,
+      };
+
+      const horizontalDirection = leftToRight ? 1 : -1;
+      const requestedLaneDistance = 44 + (routeIndex % 7) * 20;
+      const availableLaneDistance = Math.max(28, Math.abs(end.x - start.x) / 2 - 14);
+      const midX = start.x + horizontalDirection * Math.min(requestedLaneDistance, availableLaneDistance);
+      const verticalDirection = end.y >= start.y ? 1 : -1;
+      const radius = Math.min(12, Math.abs(end.y - start.y) / 2, Math.abs(end.x - start.x) / 4);
+      const beforeTurn = midX - horizontalDirection * radius;
+      const afterTurn = midX + horizontalDirection * radius;
+
+      return {
+        path: [
+          'M ' + start.x + ' ' + start.y,
+          'H ' + beforeTurn,
+          'Q ' + midX + ' ' + start.y + ' ' + midX + ' ' + (start.y + verticalDirection * radius),
+          'V ' + (end.y - verticalDirection * radius),
+          'Q ' + midX + ' ' + end.y + ' ' + afterTurn + ' ' + end.y,
+          'H ' + end.x,
+        ].join(' '),
+        labelX: midX + horizontalDirection * 5,
+        labelY: (start.y + end.y) / 2 - 7,
+      };
+    };
+
+    function WebArchitectureDiagram({ classes, relationships, repoFullName, defaultBranch }) {
+      const frameRef = useRef(null);
+      const { positions, canvasHeight } = useMemo(() => getClusteredLayout(classes), [classes]);
+      const [connections, setConnections] = useState([]);
+      const [canvasSize, setCanvasSize] = useState({ width: 1280, height: canvasHeight });
+      const [diagramScale, setDiagramScale] = useState(1);
+
+      useLayoutEffect(() => {
+        const updateScale = () => {
+          const frame = frameRef.current;
+          if (!frame) return;
+          const availableHeight = Math.max(380, window.innerHeight * 0.78);
+          setDiagramScale(Math.min(1, frame.clientWidth / 1280, availableHeight / canvasHeight));
+        };
+
+        updateScale();
+        const observer = new ResizeObserver(updateScale);
+        if (frameRef.current) observer.observe(frameRef.current);
+        window.addEventListener('resize', updateScale);
+        return () => {
+          observer.disconnect();
+          window.removeEventListener('resize', updateScale);
+        };
+      }, [canvasHeight]);
+
+      useLayoutEffect(() => {
+        const nodeRectById = {};
+        classes.forEach((umlClass) => {
+          const pos = positions[umlClass.id];
+          if (!pos) return;
+          nodeRectById[umlClass.id] = {
+            x: pos.x * 1280,
+            y: pos.y,
+            width: 208,
+          };
+        });
+
+        setCanvasSize({ width: 1280, height: canvasHeight });
+        setConnections(relationships.flatMap((relationship, index) => {
+          const from = nodeRectById[relationship.fromId];
+          const to = nodeRectById[relationship.toId];
+          if (!from || !to) return [];
+          const route = createOrthogonalPath(from, to, index);
+          return [{
+            id: relationship.id,
+            path: route.path,
+            labelX: route.labelX,
+            labelY: route.labelY,
+            label: relationship.label || relationship.type,
+            dashed: relationship.type === 'dependency' || relationship.type === 'realization',
+            ...getRelationStyle(relationship),
+          }];
+        }));
+      }, [canvasHeight, classes, positions, relationships]);
+
+      return (
+        <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 overflow-hidden">
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-800 text-[10px] text-slate-400">
+            <span className="inline-block w-2 h-2 rounded-full bg-indigo-400" />
+            <span>Hybrid React renderer. Branch: {defaultBranch}. Connectors and lanes match the in-app architecture logic.</span>
+          </div>
+
+          <div ref={frameRef} className="w-full overflow-hidden" style={{ height: canvasHeight * diagramScale }}>
+            <div className="relative w-[1280px]" style={{ height: canvasHeight, transform: 'scale(' + diagramScale + ')', transformOrigin: 'top left' }}>
+              <div className="absolute inset-x-0 top-2 grid grid-cols-4 px-4 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-600">
+                {GROUPS.map((group) => <span key={group.name}>{group.name}</span>)}
+              </div>
+
+              <svg className="absolute inset-0 pointer-events-none" width={canvasSize.width} height={canvasSize.height} aria-hidden="true">
+                <defs>
+                  <marker id="architecture-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                    <path d="M0,0 L0,6 L6,3 z" fill="context-stroke" />
+                  </marker>
+                </defs>
+                {connections.map((connection) => (
+                  <g key={connection.id}>
+                    <path d={connection.path} fill="none" stroke="#020617" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d={connection.path} fill="none" stroke={connection.color} strokeWidth="1.5" strokeDasharray={connection.dashed ? '5 4' : undefined}
+                      strokeLinecap="round" strokeLinejoin="round" opacity="0.8" markerEnd="url(#architecture-arrow)" />
+                    <rect
+                      x={connection.labelX - (String(connection.label).length * 2.9 + 5)}
+                      y={connection.labelY - 7}
+                      width={String(connection.label).length * 5.8 + 10}
+                      height="14"
+                      rx="4"
+                      fill={connection.labelBackground}
+                      stroke={connection.labelBorder}
+                    />
+                    <text x={connection.labelX} y={connection.labelY} textAnchor="middle" dominantBaseline="middle" className="fill-slate-100 text-[9px]">
+                      {connection.label}
+                    </text>
+                  </g>
+                ))}
+              </svg>
+
+              {classes.map((umlClass) => {
+                const position = positions[umlClass.id];
+                const members = [...(umlClass.attributes || []), ...(umlClass.methods || [])];
+                return (
+                  <a
+                    key={umlClass.id}
+                    href={'https://github.com/' + repoFullName + '/search?q=' + encodeURIComponent(umlClass.name) + '&type=code'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={'Find ' + umlClass.name + ' in this repository on GitHub'}
+                    className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-indigo-400/30 bg-slate-900/95 shadow-md shadow-black/20 transition hover:z-20 hover:border-indigo-400/70 hover:bg-slate-800"
+                    style={{ left: (position.x * 100) + '%', top: position.y + 'px' }}
+                  >
+                    <p className="px-2.5 pt-2 text-[9px] uppercase tracking-wider text-indigo-300">«{umlClass.stereotype || 'class'}»</p>
+                    <div className="mt-1 flex items-center gap-1.5 border-y border-slate-700/80 px-2.5 py-1.5">
+                      <span className="truncate text-xs font-bold text-indigo-100">{umlClass.name}</span>
+                      <span className="text-slate-500 text-[10px]">↗</span>
+                    </div>
+                    {members.length > 0 && (
+                      <div className="space-y-0.5 px-2.5 py-2 font-mono text-[9px] leading-[1.35] text-slate-300">
+                        {members.map((line, idx) => <p key={idx} className="break-words">{line}</p>)}
+                      </div>
+                    )}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('repo-web-diagram')).render(
+      <WebArchitectureDiagram
+        classes={data.diagrams.classes}
+        relationships={data.diagrams.relationships}
+        repoFullName={data.repo.fullName}
+        defaultBranch={data.repo.defaultBranch}
+      />
+    );
+  </script>
+</body>
+</html>`;
+  };
+
   const getCurrentSnippet = (): string => {
     switch (embedType) {
       case 'iframe':      return getIframeCode();
@@ -874,6 +1243,7 @@ ${js}
       case 'css':         return getCssCode();
       case 'javascript':  return getJsCode();
       case 'combined':    return getCombinedCode();
+      case 'hybrid':      return getHybridCode();
     }
   };
 
@@ -886,6 +1256,7 @@ ${js}
   // Tab group definitions to keep the UI organised
   const tabs: { id: EmbedType; label: string }[] = [
     { id: 'combined',   label: 'Combined (HTML + CSS + JS)' },
+    { id: 'hybrid',     label: 'Hybrid (React Widget)' },
     { id: 'html',       label: 'HTML' },
     { id: 'css',        label: 'CSS' },
     { id: 'javascript', label: 'JavaScript' },
@@ -964,6 +1335,11 @@ ${js}
       {embedType === 'combined' && (
         <p className="text-xs text-slate-500">
           A fully self-contained HTML page — includes inline CSS and JS. Open it directly in a browser or paste the relevant blocks into your own page. No build tools, no framework, no CDN required.
+        </p>
+      )}
+      {embedType === 'hybrid' && (
+        <p className="text-xs text-slate-500">
+          Hybrid widget export: ships as HTML + JavaScript but runs the interactive diagram with a React runtime via CDN for behavior parity with the in-app architecture view.
         </p>
       )}
 
