@@ -1030,7 +1030,7 @@ ${js}
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
-<body class="min-h-screen bg-slate-950 p-6">
+<body class="min-h-screen bg-slate-950 p-6" style="min-height:auto; overflow:visible;">
   <div id="repo-hybrid-card"></div>
 
   <script type="text/babel">
@@ -1043,6 +1043,18 @@ ${js}
       { name: 'World & roads', match: /road|world|map|terrain|vehicle|traffic|path|location/i },
       { name: 'Data & support', match: /model|data|config|repository|save|event|player/i },
     ];
+    const DIAGRAM_THEME = {
+      background: '#020617',
+      labelText: '#E4D700',
+      labelBorder: '#E4D700',
+      labelBackground: '#6A1A41',
+      headerText: '#E4D700',
+      nodeBorder: '#E4D700',
+      nodeFill: '#6A1A41',
+      nodeText: '#FDE68A',
+      connector: '#E4D700',
+      connectorShadow: '#020617',
+    };
     const GROUP_X_POSITIONS = [0.08, 0.36, 0.64, 0.92];
 
     const getGroupIndex = (umlClass) => {
@@ -1239,7 +1251,7 @@ ${js}
                       href={node.downloadUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="opacity-0 group-hover:opacity-100 hover:text-indigo-400 transition-opacity"
+                      className="opacity-0 group-hover:opacity-100 hover:text-yellow-400 transition-opacity"
                       title="Download file"
                     >
                       ⬇
@@ -1262,7 +1274,7 @@ ${js}
               href={'https://github.com/' + repoFullName + '/tree/' + defaultBranch}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-xs text-indigo-400 hover:underline"
+              className="text-xs text-yellow-400 hover:underline"
             >
               Browse full tree
             </a>
@@ -1330,15 +1342,15 @@ ${js}
       }, [canvasHeight, classes, positions, relationships]);
 
       return (
-        <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 overflow-hidden">
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-800 text-[10px] text-slate-400">
-            <span className="inline-block w-2 h-2 rounded-full bg-indigo-400" />
+        <div className="border border-slate-700/70 overflow-hidden" style={{ backgroundColor: DIAGRAM_THEME.background }}>
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-800 text-[10px]" style={{ color: DIAGRAM_THEME.headerText }}>
+            <span className="inline-block w-2 h-2" style={{ backgroundColor: DIAGRAM_THEME.labelText }} />
             <span>Hybrid React renderer. Branch: {defaultBranch}. Connectors and lanes match the in-app architecture logic.</span>
           </div>
 
-          <div ref={frameRef} className="w-full overflow-hidden" style={{ height: canvasHeight * diagramScale }}>
+          <div ref={frameRef} className="w-full overflow-hidden" style={{ height: canvasHeight * diagramScale, backgroundColor: DIAGRAM_THEME.background }}>
             <div className="relative w-[1280px]" style={{ height: canvasHeight, transform: 'scale(' + diagramScale + ')', transformOrigin: 'top left' }}>
-              <div className="absolute inset-x-0 top-2 grid grid-cols-4 px-4 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-600">
+              <div className="absolute inset-x-0 top-2 grid grid-cols-4 px-4 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: DIAGRAM_THEME.headerText }}>
                 {GROUPS.map((group) => <span key={group.name}>{group.name}</span>)}
               </div>
 
@@ -1350,7 +1362,7 @@ ${js}
                 </defs>
                 {connections.map((connection) => (
                   <g key={connection.id}>
-                    <path d={connection.path} fill="none" stroke="#020617" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d={connection.path} fill="none" stroke={DIAGRAM_THEME.connectorShadow} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
                     <path d={connection.path} fill="none" stroke={connection.color} strokeWidth="1.5" strokeDasharray={connection.dashed ? '5 4' : undefined}
                       strokeLinecap="round" strokeLinejoin="round" opacity="0.8" markerEnd="url(#architecture-arrow)" />
                     <rect
@@ -1362,7 +1374,7 @@ ${js}
                       fill={connection.labelBackground}
                       stroke={connection.labelBorder}
                     />
-                    <text x={connection.labelX} y={connection.labelY} textAnchor="middle" dominantBaseline="middle" className="fill-slate-100 text-[9px]">
+                    <text x={connection.labelX} y={connection.labelY} textAnchor="middle" dominantBaseline="middle" className="text-[9px]" style={{ fill: DIAGRAM_THEME.labelText }}>
                       {connection.label}
                     </text>
                   </g>
@@ -1379,16 +1391,16 @@ ${js}
                     target="_blank"
                     rel="noopener noreferrer"
                     title={'Find ' + umlClass.name + ' in this repository on GitHub'}
-                    className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-indigo-400/30 bg-slate-900/95 shadow-md shadow-black/20 transition hover:z-20 hover:border-indigo-400/70 hover:bg-slate-800"
-                    style={{ left: (position.x * 100) + '%', top: position.y + 'px' }}
+                    className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 border shadow-md shadow-black/20 transition hover:z-20"
+                    style={{ left: (position.x * 100) + '%', top: position.y + 'px', borderColor: DIAGRAM_THEME.nodeBorder, backgroundColor: DIAGRAM_THEME.nodeFill, color: DIAGRAM_THEME.nodeText }}
                   >
-                    <p className="px-2.5 pt-2 text-[9px] uppercase tracking-wider text-indigo-300">«{umlClass.stereotype || 'class'}»</p>
-                    <div className="mt-1 flex items-center gap-1.5 border-y border-slate-700/80 px-2.5 py-1.5">
-                      <span className="truncate text-xs font-bold text-indigo-100">{umlClass.name}</span>
-                      <span className="text-slate-500 text-[10px]">↗</span>
+                    <p className="px-2.5 pt-2 text-[9px] uppercase tracking-wider" style={{ color: DIAGRAM_THEME.labelText }}>«{umlClass.stereotype || 'class'}»</p>
+                    <div className="mt-1 flex items-center gap-1.5 border-y px-2.5 py-1.5" style={{ borderColor: DIAGRAM_THEME.nodeBorder }}>
+                      <span className="truncate text-xs font-bold" style={{ color: DIAGRAM_THEME.nodeText }}>{umlClass.name}</span>
+                      <span className="text-[10px]" style={{ color: DIAGRAM_THEME.labelText }}>↗</span>
                     </div>
                     {members.length > 0 && (
-                      <div className="space-y-0.5 px-2.5 py-2 font-mono text-[9px] leading-[1.35] text-slate-300">
+                      <div className="space-y-0.5 px-2.5 py-2 font-mono text-[9px] leading-[1.35]" style={{ color: DIAGRAM_THEME.nodeText }}>
                         {members.map((line, idx) => <p key={idx} className="break-words">{line}</p>)}
                       </div>
                     )}
@@ -1457,7 +1469,7 @@ ${js}
         <main className="max-w-6xl mx-auto">
           <article className="p-5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 shadow-xl space-y-5">
             <div className="flex justify-end">
-              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-300 hover:text-blue-200">View on GitHub</a>
+              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-yellow-300 hover:text-yellow-200">View on GitHub</a>
             </div>
 
             <header className="flex items-start justify-between gap-4">
@@ -1468,7 +1480,7 @@ ${js}
                   <p className="text-xs text-slate-400">{data.repo.owner}</p>
                 </div>
               </div>
-              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold">Open Repository</a>
+              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 text-xs font-semibold">Open Repository</a>
             </header>
 
             <p className="text-xs text-slate-300 leading-relaxed">{data.repo.description}</p>
@@ -1483,7 +1495,7 @@ ${js}
               <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">⭐ {Number(data.repo.stars || 0).toLocaleString()}</div>
               <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">🍴 {Number(data.repo.forks || 0).toLocaleString()}</div>
               <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">🐞 {Number(data.repo.openIssues || 0).toLocaleString()}</div>
-              <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-indigo-300">{data.repo.primaryLanguage}</div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-yellow-300">{data.repo.primaryLanguage}</div>
             </div>
 
             <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
@@ -1497,7 +1509,7 @@ ${js}
                       onClick={() => setActiveDiagram(key)}
                       className={
                         'px-2.5 py-1 rounded-md transition ' +
-                        (activeDiagram === key ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200')
+                        (activeDiagram === key ? 'bg-yellow-500 text-slate-950' : 'text-slate-400 hover:text-slate-200')
                       }
                     >
                       {label}
@@ -1535,7 +1547,7 @@ ${js}
                         <span>{pct}%</span>
                       </div>
                       <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
-                        <div className="h-full bg-indigo-500" style={{ width: pct + '%' }} />
+                        <div className="h-full bg-yellow-500" style={{ width: pct + '%' }} />
                       </div>
                     </div>
                   );
@@ -1566,7 +1578,7 @@ ${js}
                     href={contributor.htmlUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-indigo-500 transition"
+                    className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-yellow-500 transition"
                   >
                     <img src={contributor.avatarUrl} alt={contributor.login} className="w-7 h-7 rounded-full border border-slate-700" />
                     <div className="min-w-0">
@@ -1582,7 +1594,39 @@ ${js}
       );
     }
 
+    let resizeNotifyTimer = null;
+
+    function notifyParentHeight() {
+      if (window.parent && window.parent !== window) {
+        const nextHeight = Math.max(document.body?.scrollHeight || 0, document.documentElement?.scrollHeight || 0, 1040);
+        window.parent.postMessage({ type: 'repo-card-size', height: nextHeight }, '*');
+      }
+    }
+
+    function scheduleParentHeightNotify() {
+      clearTimeout(resizeNotifyTimer);
+      resizeNotifyTimer = setTimeout(notifyParentHeight, 80);
+    }
+
+    const resizeObserver = new ResizeObserver(() => scheduleParentHeightNotify());
+    if (document.body) {
+      resizeObserver.observe(document.body);
+    }
+
+    const mutationObserver = new MutationObserver(() => scheduleParentHeightNotify());
+    if (document.body) {
+      mutationObserver.observe(document.body, { childList: true, subtree: true, attributes: true, characterData: true });
+    }
+
+    window.addEventListener('load', notifyParentHeight);
+    window.addEventListener('resize', notifyParentHeight);
+
+    setTimeout(notifyParentHeight, 150);
+    setTimeout(notifyParentHeight, 500);
+    setTimeout(notifyParentHeight, 1200);
+
     ReactDOM.createRoot(document.getElementById('repo-hybrid-card')).render(<RepoCard />);
+    setTimeout(notifyParentHeight, 400);
   </script>
 </body>
 </html>`;
