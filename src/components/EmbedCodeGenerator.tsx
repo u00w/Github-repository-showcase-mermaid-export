@@ -108,6 +108,17 @@ export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ data, ac
       .filter((path) => !path.startsWith('.'))
       .slice(0, 80);
     const treeLines = formatNestedTree(treePaths).slice(0, 120);
+    const treeItems = data.tree
+      .filter((item) => !item.path.startsWith('.'))
+      .slice(0, 240)
+      .map((item) => ({
+        name: item.name,
+        path: item.path,
+        type: item.type,
+        size: item.size || 0,
+        htmlUrl: item.html_url || '',
+        downloadUrl: item.download_url || '',
+      }));
 
     const snippetData = {
       repo: {
@@ -149,6 +160,7 @@ export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ data, ac
         htmlUrl: contributor.html_url,
         contributions: contributor.contributions,
       })),
+      treeItems,
       treePaths,
       treeLines,
     };
@@ -981,21 +993,18 @@ ${js}
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${escHtml(repo.full_name)} — Hybrid Architecture Widget</title>
+  <title>${escHtml(repo.full_name)} — Hybrid Repository Card</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body class="min-h-screen bg-slate-950 p-6">
-  <div class="max-w-7xl mx-auto space-y-4">
-    <h1 class="text-slate-100 font-semibold text-sm">Hybrid Web Architecture Export</h1>
-    <p class="text-slate-400 text-xs">This hybrid snippet uses React runtime + Babel to render the architecture view with the same lane and connector logic as the in-app diagram.</p>
-    <div id="repo-web-diagram"></div>
-  </div>
+  <div id="repo-hybrid-card"></div>
 
   <script type="text/babel">
-    const { useLayoutEffect, useMemo, useRef, useState } = React;
+    const { useEffect, useLayoutEffect, useMemo, useRef, useState } = React;
     const data = ${serializedData};
 
     const GROUPS = [
@@ -1092,6 +1101,148 @@ ${js}
         labelY: (start.y + end.y) / 2 - 7,
       };
     };
+
+    const sortNodes = (nodes) => nodes.sort((a, b) => {
+      if (a.type === b.type) return a.name.localeCompare(b.name);
+      return a.type === 'dir' ? -1 : 1;
+    });
+
+    const createFileHierarchy = (items) => {
+      const root = [];
+
+      items.forEach((item) => {
+        const segments = String(item.path || '').split('/').filter(Boolean);
+        let currentLevel = root;
+        let currentPath = '';
+
+        segments.forEach((segment, index) => {
+          currentPath = currentPath ? currentPath + '/' + segment : segment;
+          const isLeaf = index === segments.length - 1;
+          let node = currentLevel.find((candidate) => candidate.name === segment);
+
+          if (!node) {
+            node = isLeaf
+              ? { ...item, name: segment, path: currentPath, children: [] }
+              : { name: segment, path: currentPath, type: 'dir', children: [] };
+            currentLevel.push(node);
+          }
+
+          if (!isLeaf) currentLevel = node.children;
+        });
+      });
+
+      const sortRecursively = (nodes) => {
+        sortNodes(nodes).forEach((node) => sortRecursively(node.children || []));
+      };
+
+      sortRecursively(root);
+      return root;
+    };
+
+    const formatFileSize = (bytes) => {
+      if (!bytes) return '-';
+      if (bytes < 1024) return bytes + ' B';
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    };
+
+    function HybridFileExplorer({ treeItems, repoFullName, defaultBranch }) {
+      const [expandedFolders, setExpandedFolders] = useState(new Set());
+      const hierarchy = useMemo(() => createFileHierarchy(treeItems || []), [treeItems]);
+
+      useEffect(() => {
+        setExpandedFolders(new Set());
+      }, [repoFullName, defaultBranch]);
+
+      const toggleFolder = (path) => {
+        setExpandedFolders((current) => {
+          const next = new Set(current);
+          if (next.has(path)) next.delete(path);
+          else next.add(path);
+          return next;
+        });
+      };
+
+      const renderNode = (node, depth = 0) => {
+        const isFolder = node.type === 'dir';
+        const isExpanded = expandedFolders.has(node.path);
+        const githubUrl = isFolder
+          ? 'https://github.com/' + repoFullName + '/tree/' + defaultBranch + '/' + node.path
+          : (node.htmlUrl || 'https://github.com/' + repoFullName + '/blob/' + defaultBranch + '/' + node.path);
+
+        return (
+          <React.Fragment key={node.path}>
+            <div
+              className="flex items-center justify-between py-2 pr-2 hover:bg-slate-800/40 rounded-lg transition-colors group"
+              style={{ paddingLeft: (depth * 16 + 8) + 'px' }}
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                {isFolder ? (
+                  <button
+                    type="button"
+                    onClick={() => toggleFolder(node.path)}
+                    className="w-4 text-slate-400 hover:text-slate-100"
+                    aria-expanded={isExpanded}
+                    aria-label={(isExpanded ? 'Collapse ' : 'Expand ') + node.name}
+                  >
+                    {isExpanded ? '▾' : '▸'}
+                  </button>
+                ) : (
+                  <span className="w-4 text-slate-500">·</span>
+                )}
+                <span className={isFolder ? 'text-amber-400' : 'text-slate-400'}>{isFolder ? '📁' : '📄'}</span>
+                <a
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={(isFolder ? 'text-slate-200 font-semibold' : 'text-slate-300') + ' truncate hover:underline'}
+                >
+                  {node.name}
+                </a>
+              </div>
+
+              {!isFolder && (
+                <div className="flex items-center gap-4 shrink-0 text-slate-500 text-[11px]">
+                  <span>{formatFileSize(node.size)}</span>
+                  {node.downloadUrl && (
+                    <a
+                      href={node.downloadUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="opacity-0 group-hover:opacity-100 hover:text-indigo-400 transition-opacity"
+                      title="Download file"
+                    >
+                      ⬇
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {isFolder && isExpanded && (node.children || []).map((child) => renderNode(child, depth + 1))}
+          </React.Fragment>
+        );
+      };
+
+      return (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+            <h4 className="text-sm font-semibold text-slate-200">Repository Structure ({defaultBranch})</h4>
+            <a
+              href={'https://github.com/' + repoFullName + '/tree/' + defaultBranch}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-indigo-400 hover:underline"
+            >
+              Browse full tree
+            </a>
+          </div>
+          <div className="font-mono text-xs">
+            {hierarchy.map((node) => renderNode(node))}
+          </div>
+        </div>
+      );
+    }
 
     function WebArchitectureDiagram({ classes, relationships, repoFullName, defaultBranch }) {
       const frameRef = useRef(null);
@@ -1220,14 +1371,173 @@ ${js}
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('repo-web-diagram')).render(
-      <WebArchitectureDiagram
-        classes={data.diagrams.classes}
-        relationships={data.diagrams.relationships}
-        repoFullName={data.repo.fullName}
-        defaultBranch={data.repo.defaultBranch}
-      />
-    );
+    function RepoCard() {
+      const [activeDiagram, setActiveDiagram] = useState('mermaid');
+      const [mermaidError, setMermaidError] = useState('');
+      const mermaidContainerRef = useRef(null);
+
+      useEffect(() => {
+        if (activeDiagram !== 'mermaid') return;
+        if (!mermaidContainerRef.current) return;
+        setMermaidError('');
+
+        if (!window.mermaid) {
+          mermaidContainerRef.current.innerHTML = '<p class="text-xs text-slate-300">Mermaid runtime not available.</p>';
+          return;
+        }
+
+        try {
+          window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'neutral' });
+          const renderId = 'hybrid-mermaid-' + Math.random().toString(36).slice(2);
+          window.mermaid.render(renderId, data.diagrams.mermaidCode).then((result) => {
+            if (!mermaidContainerRef.current) return;
+            mermaidContainerRef.current.innerHTML = result.svg;
+            const svg = mermaidContainerRef.current.querySelector('svg');
+            if (svg) {
+              svg.style.width = '100%';
+              svg.style.height = 'auto';
+              svg.style.display = 'block';
+            }
+          }).catch((err) => {
+            setMermaidError('Mermaid render failed: ' + (err && err.message ? err.message : 'unknown error'));
+          });
+        } catch (err) {
+          setMermaidError('Mermaid render failed: ' + (err && err.message ? err.message : 'unknown error'));
+        }
+      }, [activeDiagram]);
+
+      const totalLanguageBytes = data.languages.reduce((sum, item) => sum + item.bytes, 0);
+
+      return (
+        <main className="max-w-6xl mx-auto">
+          <article className="p-5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 shadow-xl space-y-5">
+            <div className="flex justify-end">
+              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-300 hover:text-blue-200">View on GitHub</a>
+            </div>
+
+            <header className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <img src={data.repo.ownerAvatarUrl} alt={data.repo.owner} className="w-10 h-10 rounded-xl border border-slate-700" />
+                <div>
+                  <h2 className="font-bold text-base text-white">{data.repo.fullName}</h2>
+                  <p className="text-xs text-slate-400">{data.repo.owner}</p>
+                </div>
+              </div>
+              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold">Open Repository</a>
+            </header>
+
+            <p className="text-xs text-slate-300 leading-relaxed">{data.repo.description}</p>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {(data.repo.topics || []).map((topic) => (
+                <span key={topic} className="px-2 py-0.5 rounded-md text-[11px] bg-slate-800 border border-slate-700 text-slate-300">#{topic}</span>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+              <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">⭐ {Number(data.repo.stars || 0).toLocaleString()}</div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">🍴 {Number(data.repo.forks || 0).toLocaleString()}</div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">🐞 {Number(data.repo.openIssues || 0).toLocaleString()}</div>
+              <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-indigo-300">{data.repo.primaryLanguage}</div>
+            </div>
+
+            <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-semibold text-white">Architecture Diagrams</h3>
+                <div className="flex gap-1 rounded-lg border border-slate-800 bg-slate-900 p-1 text-[11px]">
+                  {[['mermaid', 'Mermaid'], ['web', 'Interactive Web']].map(([key, label]) => (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setActiveDiagram(key)}
+                      className={
+                        'px-2.5 py-1 rounded-md transition ' +
+                        (activeDiagram === key ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200')
+                      }
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {activeDiagram === 'mermaid' && (
+                <div className="space-y-2">
+                  {mermaidError && <p className="text-xs text-rose-300 bg-rose-950/40 border border-rose-800 rounded-lg p-2">{mermaidError}</p>}
+                  <div ref={mermaidContainerRef} className="w-full overflow-x-auto rounded-lg border border-slate-700 bg-white text-slate-900 p-2" />
+                </div>
+              )}
+
+              {activeDiagram === 'web' && (
+                <WebArchitectureDiagram
+                  classes={data.diagrams.classes}
+                  relationships={data.diagrams.relationships}
+                  repoFullName={data.repo.fullName}
+                  defaultBranch={data.repo.defaultBranch}
+                />
+              )}
+            </section>
+
+            <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+              <h3 className="text-sm font-semibold text-white">Language Composition &amp; Tech Stack</h3>
+              <div className="space-y-2">
+                {data.languages.map((language) => {
+                  const pct = totalLanguageBytes > 0 ? Math.round((language.bytes / totalLanguageBytes) * 100) : 0;
+                  return (
+                    <div key={language.name} className="space-y-1">
+                      <div className="flex items-center justify-between text-xs text-slate-300">
+                        <span>{language.name}</span>
+                        <span>{pct}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                        <div className="h-full bg-indigo-500" style={{ width: pct + '%' }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="flex flex-wrap gap-2 pt-1">
+                <span className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Primary: {data.repo.primaryLanguage}</span>
+                <span className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">License: {data.repo.license}</span>
+                <span className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Branch: {data.repo.defaultBranch}</span>
+              </div>
+            </section>
+
+            <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-2">
+              <HybridFileExplorer
+                treeItems={data.treeItems}
+                repoFullName={data.repo.fullName}
+                defaultBranch={data.repo.defaultBranch}
+              />
+            </section>
+
+            <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+              <h3 className="text-sm font-semibold text-white">Top Contributors</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                {(data.contributors || []).map((contributor) => (
+                  <a
+                    key={contributor.login}
+                    href={contributor.htmlUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-indigo-500 transition"
+                  >
+                    <img src={contributor.avatarUrl} alt={contributor.login} className="w-7 h-7 rounded-full border border-slate-700" />
+                    <div className="min-w-0">
+                      <p className="text-xs text-slate-100 truncate">{contributor.login}</p>
+                      <p className="text-[11px] text-slate-400">{Number(contributor.contributions || 0).toLocaleString()} contributions</p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </section>
+          </article>
+        </main>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('repo-hybrid-card')).render(<RepoCard />);
   </script>
 </body>
 </html>`;
