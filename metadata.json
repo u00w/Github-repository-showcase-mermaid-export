@@ -1,0 +1,6 @@
+{
+  "name": "GitHub Repository Showcase",
+  "description": "An interactive showcase and embed generator for presenting GitHub repositories cleanly on web pages.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
