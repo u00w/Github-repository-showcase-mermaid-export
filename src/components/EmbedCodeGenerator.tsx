@@ -37,6 +37,55 @@ function escJs(value: string): string {
     .replace(/<\/script>/gi, '<\\/script>');
 }
 
+interface TreeNode {
+  name: string;
+  isFile: boolean;
+  children: Map<string, TreeNode>;
+}
+
+function formatNestedTree(paths: string[]): string[] {
+  const root = new Map<string, TreeNode>();
+
+  for (const rawPath of paths) {
+    const parts = rawPath.split('/').filter(Boolean);
+    if (parts.length === 0) continue;
+
+    let cursor = root;
+    for (let i = 0; i < parts.length; i += 1) {
+      const part = parts[i];
+      const isFile = i === parts.length - 1;
+      const existing = cursor.get(part);
+      if (!existing) {
+        cursor.set(part, { name: part, isFile, children: new Map<string, TreeNode>() });
+      } else if (isFile) {
+        existing.isFile = true;
+      }
+      cursor = cursor.get(part)!.children;
+    }
+  }
+
+  const lines: string[] = [];
+
+  const walk = (nodes: Map<string, TreeNode>, prefix: string) => {
+    const entries = Array.from(nodes.values()).sort((a, b) => {
+      if (a.isFile !== b.isFile) return a.isFile ? 1 : -1;
+      return a.name.localeCompare(b.name);
+    });
+
+    entries.forEach((node, index) => {
+      const isLast = index === entries.length - 1;
+      const connector = isLast ? '└─' : '├─';
+      lines.push(`${prefix}${connector} ${node.name}${node.isFile ? '' : '/'}`);
+      if (node.children.size > 0) {
+        walk(node.children, `${prefix}${isLast ? '   ' : '│  '}`);
+      }
+    });
+  };
+
+  walk(root, '');
+  return lines;
+}
+
 export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ data, activeTheme }) => {
   const { repo } = data;
   const [embedType, setEmbedType] = useState<EmbedType>('tailwind');
@@ -57,7 +106,8 @@ export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ data, ac
     const treePaths = data.tree
       .map((item) => item.path)
       .filter((path) => !path.startsWith('.'))
-      .slice(0, 24);
+      .slice(0, 80);
+    const treeLines = formatNestedTree(treePaths).slice(0, 120);
 
     const snippetData = {
       repo: {
@@ -78,7 +128,6 @@ export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ data, ac
       languages: languageEntries,
       diagrams: {
         mermaidCode: architectureDiagram.mermaidCode || 'classDiagram\n  class Repository',
-        plantUmlCode: architectureDiagram.plantUmlCode || '@startuml\nclass Repository\n@enduml',
         classes: architectureDiagram.classes.map((item) => ({
           id: item.id,
           name: item.name,
@@ -94,7 +143,14 @@ export const EmbedCodeGenerator: React.FC<EmbedCodeGeneratorProps> = ({ data, ac
           label: rel.label || rel.type,
         })),
       },
+      contributors: data.contributors.slice(0, 8).map((contributor) => ({
+        login: contributor.login,
+        avatarUrl: contributor.avatar_url,
+        htmlUrl: contributor.html_url,
+        contributions: contributor.contributions,
+      })),
       treePaths,
+      treeLines,
     };
     return snippetData;
   };
@@ -165,7 +221,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
           rel="noopener noreferrer"
           className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold"
         >
-          View Repo
+          View on GitHub
         </a>
       </header>
 
@@ -193,8 +249,6 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
             {[
               ['mermaid', 'Mermaid'],
               ['web', 'Interactive Web'],
-              ['plantuml', 'PlantUML'],
-              ['specs', 'Class Inventory'],
             ].map(([key, label]) => (
               <button
                 key={key}
@@ -220,39 +274,29 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         )}
 
         {activeDiagram === 'web' && (
-          <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-3 text-xs text-slate-300 space-y-2">
+          <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-3 text-xs text-slate-300 space-y-3">
             {typeof renderWebArchitecture === 'function' ? (
               renderWebArchitecture({
                 classes: data.diagrams.classes,
                 relationships: data.diagrams.relationships,
               })
             ) : (
-              <>
-                <p className="text-slate-200 font-medium">
-                  Interactive Web Architecture hook is available.
-                </p>
-                <p>
-                  Pass a renderWebArchitecture function prop to wire this tab to your interactive renderer (same architecture as this project’s WebArchitectureDiagram).
-                </p>
-              </>
-            )}
-          </div>
-        )}
-
-        {activeDiagram === 'plantuml' && (
-          <pre className="text-[11px] text-emerald-200 bg-slate-950 border border-slate-800 rounded-lg p-3 overflow-x-auto">
-{data.diagrams.plantUmlCode}
-          </pre>
-        )}
-
-        {activeDiagram === 'specs' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-            {data.diagrams.classes.slice(0, 10).map((item) => (
-              <div key={item.id} className="rounded-lg border border-slate-800 bg-slate-900 p-2 text-xs">
-                <p className="font-semibold text-slate-100">{item.name}</p>
-                <p className="text-[11px] text-slate-400">{item.stereotype} · {item.packageName || 'root'}</p>
+              <div className="space-y-2">
+                <p className="text-slate-200 font-medium">Interactive node map</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {data.diagrams.classes.slice(0, 8).map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      className="text-left px-2.5 py-2 rounded-md border border-slate-700 bg-slate-950/60 hover:border-indigo-500 hover:bg-slate-900 transition"
+                    >
+                      <p className="text-slate-100 font-medium truncate">{item.name}</p>
+                      <p className="text-[11px] text-slate-400">{item.stereotype || 'class'} • {item.packageName || 'root'}</p>
+                    </button>
+                  ))}
+                </div>
               </div>
-            ))}
+            )}
           </div>
         )}
       </section>
@@ -286,8 +330,29 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-2">
         <h4 className="text-sm font-semibold text-white">Repository Structure ({data.repo.defaultBranch})</h4>
         <pre className="text-[11px] leading-relaxed text-slate-300 font-mono bg-slate-950 border border-slate-800 rounded-lg p-3 overflow-x-auto">
-{data.treePaths.map((path) => \`• \${path}\`).join('\\n')}
+{data.treeLines.join('\\n')}
         </pre>
+      </section>
+
+      <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+        <h4 className="text-sm font-semibold text-white">Top Contributors</h4>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+          {data.contributors.map((contributor) => (
+            <a
+              key={contributor.login}
+              href={contributor.htmlUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-indigo-500 transition"
+            >
+              <img src={contributor.avatarUrl} alt={contributor.login} className="w-7 h-7 rounded-full border border-slate-700" />
+              <div className="min-w-0">
+                <p className="text-xs text-slate-100 truncate">{contributor.login}</p>
+                <p className="text-[11px] text-slate-400">{contributor.contributions} contributions</p>
+              </div>
+            </a>
+          ))}
+        </div>
       </section>
 
       <div className="text-[11px] text-slate-500 border-t border-slate-800 pt-3">
@@ -308,11 +373,14 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
   <div class="h-2 rounded-full bg-slate-800 overflow-hidden"><div class="h-full bg-indigo-500" style="width:${pct}%"></div></div>
 </div>`;
     }).join('\n');
-    const treeRows = cardData.treePaths.map((path) => `• ${escHtml(path)}`).join('\n');
-    const classRows = cardData.diagrams.classes.slice(0, 10).map((item) => `<div class="rounded-lg border border-slate-800 bg-slate-900 p-2 text-xs">
-  <p class="font-semibold text-slate-100">${escHtml(item.name)}</p>
-  <p class="text-[11px] text-slate-400">${escHtml(item.stereotype)} · ${escHtml(item.packageName || 'root')}</p>
-</div>`).join('\n');
+    const treeRows = cardData.treeLines.map((path) => escHtml(path)).join('\n');
+    const contributorRows = cardData.contributors.map((contributor) => `<a href="${escAttr(contributor.htmlUrl)}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-indigo-500 transition">
+  <img src="${escAttr(contributor.avatarUrl)}" alt="${escAttr(contributor.login)}" class="w-7 h-7 rounded-full border border-slate-700" />
+  <div class="min-w-0">
+    <p class="text-xs text-slate-100 truncate">${escHtml(contributor.login)}</p>
+    <p class="text-[11px] text-slate-400">${Number(contributor.contributions).toLocaleString()} contributions</p>
+  </div>
+</a>`).join('\n');
     return `<!-- GitHub Repository Showcase Card (Tailwind-only markup) -->
 <article class="p-5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 max-w-4xl shadow-xl space-y-5">
   <header class="flex items-start justify-between gap-4">
@@ -323,7 +391,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         <p class="text-xs text-slate-400">${escHtml(cardData.repo.owner)}</p>
       </div>
     </div>
-    <a href="${escAttr(cardData.repo.htmlUrl)}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold">View Repo</a>
+    <a href="${escAttr(cardData.repo.htmlUrl)}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold">View on GitHub</a>
   </header>
   <p class="text-xs text-slate-300 leading-relaxed">${escHtml(cardData.repo.description)}</p>
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
@@ -336,8 +404,6 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
     <h4 class="text-sm font-semibold text-white">Architecture Diagrams</h4>
     <p class="text-xs text-slate-400">For interactive tabs + Mermaid rendering, pair this with the JavaScript export.</p>
     <pre class="text-[11px] text-slate-200 bg-slate-950 border border-slate-800 rounded-lg p-3 overflow-x-auto">${escHtml(cardData.diagrams.mermaidCode)}</pre>
-    <pre class="text-[11px] text-emerald-200 bg-slate-950 border border-slate-800 rounded-lg p-3 overflow-x-auto">${escHtml(cardData.diagrams.plantUmlCode)}</pre>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">${classRows}</div>
   </section>
   <section class="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
     <h4 class="text-sm font-semibold text-white">Language Composition &amp; Tech Stack</h4>
@@ -351,6 +417,10 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
   <section class="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-2">
     <h4 class="text-sm font-semibold text-white">Repository Structure (${escHtml(cardData.repo.defaultBranch)})</h4>
     <pre class="text-[11px] leading-relaxed text-slate-300 font-mono bg-slate-950 border border-slate-800 rounded-lg p-3 overflow-x-auto">${treeRows}</pre>
+  </section>
+  <section class="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+    <h4 class="text-sm font-semibold text-white">Top Contributors</h4>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">${contributorRows}</div>
   </section>
 </article>`;
   };
@@ -369,9 +439,10 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 <div class="repo-card" id="repo-card">
   <!-- JS export injects complete parity card content here:
        - repo header/basic metadata
-       - architecture diagram tabs (Mermaid / Interactive Web / PlantUML / Class Inventory)
+  - architecture diagram tabs (Mermaid / Interactive Web)
        - Language Composition & Tech Stack
-       - Repository Structure (main/default branch) -->
+  - Repository Structure (categorized by nested folders)
+  - Top Contributors -->
 </div>`;
   };
 
@@ -403,6 +474,9 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 .repo-card__owner { font-size: 11px; color: #94a3b8; }
 .repo-card__btn { flex-shrink: 0; padding: 6px 12px; background: #4f46e5; color: #fff; border-radius: 8px; font-size: 11px; font-weight: 600; text-decoration: none; transition: background 0.15s ease; }
 .repo-card__btn:hover { background: #6366f1; }
+.repo-card__top-links { display: flex; justify-content: flex-end; }
+.repo-card__top-link { color: #93c5fd; font-size: 11px; text-decoration: none; }
+.repo-card__top-link:hover { color: #bfdbfe; }
 .repo-card__description { margin: 0; font-size: 12px; line-height: 1.6; color: #cbd5e1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .repo-card__stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .repo-card__stat { border: 1px solid #1e293b; background: rgba(2, 6, 23, 0.7); border-radius: 10px; padding: 8px 10px; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; font-size: 11px; color: #94a3b8; }
@@ -414,13 +488,9 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 .repo-card__diagram-pane { border: 1px solid #1e293b; background: #020617; border-radius: 10px; padding: 10px; }
 .repo-card__diagram-pane.is-hidden { display: none; }
 .repo-card__diagram-mermaid { overflow-x: auto; background: #fff; color: #0f172a; border-radius: 8px; padding: 8px; }
+.repo-card__web-diagram { width: 100%; overflow-x: auto; }
+.repo-card__web-svg { width: 100%; min-width: 560px; height: 340px; display: block; }
 .repo-card__diagram-error { margin: 0 0 8px; color: #fecdd3; font-size: 11px; }
-.repo-card__codeblock { margin: 0; overflow-x: auto; white-space: pre; font-size: 11px; color: #e2e8f0; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
-.repo-card__codeblock--plantuml { color: #a7f3d0; }
-.repo-card__class-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-.repo-card__class-item { border: 1px solid #1e293b; border-radius: 8px; background: #0b1220; padding: 8px; }
-.repo-card__class-name { margin: 0; color: #f1f5f9; font-weight: 700; font-size: 12px; }
-.repo-card__class-meta { margin: 4px 0 0; color: #94a3b8; font-size: 11px; }
 .repo-card__language-list { display: flex; flex-direction: column; gap: 8px; }
 .repo-card__language-row { display: flex; justify-content: space-between; font-size: 11px; color: #cbd5e1; margin-bottom: 4px; }
 .repo-card__bar { height: 8px; border-radius: 999px; background: #1e293b; overflow: hidden; }
@@ -428,10 +498,17 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 .repo-card__tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .repo-card__tag { border: 1px solid #334155; background: #0b1220; border-radius: 8px; padding: 4px 8px; font-size: 11px; color: #cbd5e1; }
 .repo-card__tree { margin: 0; white-space: pre; overflow-x: auto; font-size: 11px; line-height: 1.5; color: #cbd5e1; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
+.repo-card__contributors { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.repo-card__contributor { display: flex; align-items: center; gap: 8px; border: 1px solid #1e293b; border-radius: 8px; background: #0b1220; padding: 8px; text-decoration: none; }
+.repo-card__contributor:hover { border-color: #4f46e5; }
+.repo-card__contributor-avatar { width: 28px; height: 28px; border-radius: 999px; border: 1px solid #334155; }
+.repo-card__contributor-meta { min-width: 0; }
+.repo-card__contributor-name { margin: 0; color: #f1f5f9; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.repo-card__contributor-count { margin: 2px 0 0; color: #94a3b8; font-size: 11px; }
 .repo-card__placeholder { margin: 0; color: #cbd5e1; font-size: 12px; }
 @media (max-width: 720px) {
   .repo-card__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .repo-card__class-grid { grid-template-columns: 1fr; }
+  .repo-card__contributors { grid-template-columns: 1fr; }
 }
 .repo-card--light { background: #ffffff; border-color: #e2e8f0; color: #1e293b; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); }
 .repo-card--light .repo-card__section,
@@ -442,14 +519,14 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 .repo-card--light .repo-card__diagram-pane { background: #f8fafc; border-color: #cbd5e1; color: #334155; }
 .repo-card--light .repo-card__section-title,
 .repo-card--light .repo-card__name,
-.repo-card--light .repo-card__class-name { color: #0f172a; }
+.repo-card--light .repo-card__contributor-name { color: #0f172a; }
 .repo-card--light .repo-card__owner,
-.repo-card--light .repo-card__class-meta,
+.repo-card--light .repo-card__contributor-count,
 .repo-card--light .repo-card__language-row { color: #64748b; }
 .repo-card--light .repo-card__diagram-mermaid { border: 1px solid #cbd5e1; }
-.repo-card--light .repo-card__codeblock { color: #1e293b; }
-.repo-card--light .repo-card__codeblock--plantuml { color: #166534; }
 .repo-card--light .repo-card__tree { color: #334155; }
+.repo-card--light .repo-card__contributor { background: #f8fafc; border-color: #cbd5e1; }
+.repo-card--light .repo-card__top-link { color: #1d4ed8; }
 .repo-card--light .repo-card__tab-btn.is-active { color: #fff; }`;
   };
 
@@ -494,17 +571,100 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
     }).join('');
   }
 
-  function renderClassRows(classes) {
-    return (classes || []).slice(0, 10).map(function (item) {
-      return '<div class="repo-card__class-item">' +
-        '<p class="repo-card__class-name">' + esc(item.name) + '</p>' +
-        '<p class="repo-card__class-meta">' + esc(item.stereotype || 'class') + ' · ' + esc(item.packageName || 'root') + '</p>' +
-      '</div>';
+  function renderTree(paths) {
+    var root = {};
+    (paths || []).forEach(function (path) {
+      var parts = String(path).split('/').filter(Boolean);
+      if (!parts.length) return;
+      var cursor = root;
+      parts.forEach(function (part, index) {
+        if (!cursor[part]) cursor[part] = { children: {}, isFile: false };
+        if (index === parts.length - 1) cursor[part].isFile = true;
+        cursor = cursor[part].children;
+      });
+    });
+
+    var lines = [];
+    function walk(nodes, prefix) {
+      var names = Object.keys(nodes).sort(function (a, b) {
+        var aIsFile = !!nodes[a].isFile;
+        var bIsFile = !!nodes[b].isFile;
+        if (aIsFile !== bIsFile) return aIsFile ? 1 : -1;
+        return a.localeCompare(b);
+      });
+      names.forEach(function (name, idx) {
+        var isLast = idx === names.length - 1;
+        var connector = isLast ? '└─' : '├─';
+        var node = nodes[name];
+        lines.push(prefix + connector + ' ' + name + (node.isFile ? '' : '/'));
+        if (Object.keys(node.children).length) {
+          walk(node.children, prefix + (isLast ? '   ' : '│  '));
+        }
+      });
+    }
+
+    walk(root, '');
+    return lines.join('\\n');
+  }
+
+  function renderContributors(contributors) {
+    return (contributors || []).map(function (item) {
+      return '<a class="repo-card__contributor" href="' + esc(item.htmlUrl) + '" target="_blank" rel="noopener noreferrer">' +
+        '<img class="repo-card__contributor-avatar" src="' + esc(item.avatarUrl) + '" alt="' + esc(item.login) + '" />' +
+        '<div class="repo-card__contributor-meta">' +
+          '<p class="repo-card__contributor-name">' + esc(item.login) + '</p>' +
+          '<p class="repo-card__contributor-count">' + fmtNum(item.contributions || 0) + ' contributions</p>' +
+        '</div>' +
+      '</a>';
     }).join('');
   }
 
-  function renderTree(paths) {
-    return (paths || []).map(function (path) { return '• ' + path; }).join('\\n');
+  function renderWebArchitecture(el, data) {
+    var container = el.querySelector('[data-web-container]');
+    if (!container) return;
+
+    var classes = (data.diagrams && data.diagrams.classes ? data.diagrams.classes : []).slice(0, 8);
+    var relationships = data.diagrams && data.diagrams.relationships ? data.diagrams.relationships : [];
+
+    if (!classes.length) {
+      container.innerHTML = '<p class="repo-card__placeholder">No architecture classes available.</p>';
+      return;
+    }
+
+    var cols = 4;
+    var xGap = 160;
+    var yGap = 120;
+    var startX = 80;
+    var startY = 70;
+    var posById = {};
+
+    classes.forEach(function (cls, index) {
+      var col = index % cols;
+      var row = Math.floor(index / cols);
+      posById[cls.id] = { x: startX + col * xGap, y: startY + row * yGap };
+    });
+
+    var edgeSvg = relationships
+      .filter(function (rel) { return posById[rel.fromId] && posById[rel.toId]; })
+      .map(function (rel) {
+        var from = posById[rel.fromId];
+        var to = posById[rel.toId];
+        return '<line x1="' + from.x + '" y1="' + from.y + '" x2="' + to.x + '" y2="' + to.y + '" stroke="#475569" stroke-width="2" />';
+      })
+      .join('');
+
+    var nodeSvg = classes.map(function (cls) {
+      var pos = posById[cls.id];
+      var label = esc(cls.name);
+      var tooltip = esc((cls.stereotype || 'class') + ' · ' + (cls.packageName || 'root'));
+      return '<g>' +
+        '<title>' + tooltip + '</title>' +
+        '<circle cx="' + pos.x + '" cy="' + pos.y + '" r="24" fill="#312e81" stroke="#818cf8" stroke-width="2"></circle>' +
+        '<text x="' + pos.x + '" y="' + (pos.y + 44) + '" fill="#cbd5e1" text-anchor="middle" font-size="10">' + label + '</text>' +
+      '</g>';
+    }).join('');
+
+    container.innerHTML = '<svg class="repo-card__web-svg" viewBox="0 0 760 340" role="img" aria-label="Interactive architecture diagram">' + edgeSvg + nodeSvg + '</svg>';
   }
 
   function bindDiagramUi(el, data) {
@@ -520,6 +680,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         pane.classList.toggle('is-hidden', !on);
       });
       if (tab === 'mermaid') renderMermaid(el, data.diagrams.mermaidCode || '');
+      if (tab === 'web') renderWebArchitecture(el, data);
     }
     buttons.forEach(function (btn) {
       btn.addEventListener('click', function () { setActive(btn.getAttribute('data-diagram-tab')); });
@@ -558,6 +719,9 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
   function renderCard(el, d) {
     el.className = 'repo-card';
     el.innerHTML =
+      '<div class="repo-card__top-links">' +
+        '<a class="repo-card__top-link" href="' + esc(d.repo.htmlUrl) + '" target="_blank" rel="noopener noreferrer">View on GitHub</a>' +
+      '</div>' +
       '<div class="repo-card__header">' +
         '<div class="repo-card__owner-group">' +
           '<img class="repo-card__avatar" src="' + esc(d.repo.ownerAvatarUrl) + '" alt="' + esc(d.repo.owner) + '" />' +
@@ -566,7 +730,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
             '<span class="repo-card__owner">' + esc(d.repo.owner) + '</span>' +
           '</div>' +
         '</div>' +
-        '<a class="repo-card__btn" href="' + esc(d.repo.htmlUrl) + '" target="_blank" rel="noopener noreferrer">View Repo</a>' +
+        '<a class="repo-card__btn" href="' + esc(d.repo.htmlUrl) + '" target="_blank" rel="noopener noreferrer">Open Repository</a>' +
       '</div>' +
       '<p class="repo-card__description">' + esc(d.repo.description || '') + '</p>' +
       '<div class="repo-card__stats">' +
@@ -580,21 +744,13 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         '<div class="repo-card__diagram-tabs">' +
           '<button class="repo-card__tab-btn" data-diagram-tab="mermaid">Mermaid</button>' +
           '<button class="repo-card__tab-btn" data-diagram-tab="web">Interactive Web</button>' +
-          '<button class="repo-card__tab-btn" data-diagram-tab="plantuml">PlantUML</button>' +
-          '<button class="repo-card__tab-btn" data-diagram-tab="specs">Class Inventory</button>' +
         '</div>' +
         '<div class="repo-card__diagram-pane" data-diagram-pane="mermaid">' +
           '<p class="repo-card__diagram-error" data-mermaid-error></p>' +
           '<div class="repo-card__diagram-mermaid" data-mermaid-container></div>' +
         '</div>' +
         '<div class="repo-card__diagram-pane is-hidden" data-diagram-pane="web">' +
-          '<p class="repo-card__placeholder">Interactive Web Architecture hook is available. Wire this tab to your own renderer for fully interactive diagrams.</p>' +
-        '</div>' +
-        '<div class="repo-card__diagram-pane is-hidden" data-diagram-pane="plantuml">' +
-          '<pre class="repo-card__codeblock repo-card__codeblock--plantuml">' + esc(d.diagrams.plantUmlCode || '') + '</pre>' +
-        '</div>' +
-        '<div class="repo-card__diagram-pane is-hidden" data-diagram-pane="specs">' +
-          '<div class="repo-card__class-grid">' + renderClassRows(d.diagrams.classes) + '</div>' +
+          '<div class="repo-card__web-diagram" data-web-container></div>' +
         '</div>' +
       '</section>' +
       '<section class="repo-card__section">' +
@@ -608,7 +764,11 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       '</section>' +
       '<section class="repo-card__section">' +
         '<h4 class="repo-card__section-title">Repository Structure (' + esc(d.repo.defaultBranch) + ')</h4>' +
-        '<pre class="repo-card__tree">' + esc(renderTree(d.treePaths)) + '</pre>' +
+        '<pre class="repo-card__tree">' + esc((d.treeLines && d.treeLines.length ? d.treeLines.join('\\n') : renderTree(d.treePaths))) + '</pre>' +
+      '</section>' +
+      '<section class="repo-card__section">' +
+        '<h4 class="repo-card__section-title">Top Contributors</h4>' +
+        '<div class="repo-card__contributors">' + renderContributors(d.contributors) + '</div>' +
       '</section>' +
       '<div class="repo-card__tags">' +
         (d.repo.topics || []).slice(0, 12).map(function (topic) { return '<span class="repo-card__tag">#' + esc(topic) + '</span>'; }).join('') +
