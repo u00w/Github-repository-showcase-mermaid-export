@@ -23,13 +23,18 @@ test('HTML/CSS/JS exports include parity sections and functional diagram tabs', 
   assert.match(source, /JS export injects complete parity card content here/);
   assert.match(source, /repo-card__diagram-tabs/);
   assert.match(source, /data-diagram-tab="mermaid"/);
+  assert.match(source, /repo-card__diagram-toolbar/);
+  assert.match(source, /data-zoom-out-mermaid/);
+  assert.match(source, /data-zoom-out-web/);
   assert.match(source, /Language Composition &amp; Tech Stack/);
   assert.match(source, /Repository Structure \(/);
   assert.match(source, /Top Contributors/);
   assert.match(source, /View on GitHub/);
-  assert.match(source, /renderWebArchitecture\(el, data\)/);
+  assert.match(source, /renderWebArchitecture\(el, data, state\.webZoom\)/);
   assert.match(source, /window\.RepoCard = \{ render: renderRepoCard \}/);
   assert.match(source, /cdn\.jsdelivr\.net\/npm\/mermaid@11\/dist\/mermaid\.min\.js/);
+  assert.match(source, /Zoom out Mermaid diagram/);
+  assert.match(source, /Zoom out web architecture diagram/);
 });
 
 test('iFrame and Markdown snippets include full-card parity guidance text', () => {

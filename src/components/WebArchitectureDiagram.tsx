@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ExternalLink, GitBranch } from 'lucide-react';
+import { ExternalLink, GitBranch, RotateCcw, ZoomIn, ZoomOut } from 'lucide-react';
 import { UmlClass, UmlRelationship } from '../types';
 
 interface WebArchitectureDiagramProps {
@@ -144,6 +144,13 @@ export const WebArchitectureDiagram: React.FC<WebArchitectureDiagramProps> = ({
   const [connections, setConnections] = useState<Connection[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 1280, height: canvasHeight });
   const [diagramScale, setDiagramScale] = useState(1);
+  const [zoomLevel, setZoomLevel] = useState(1);
+
+  const clampZoom = (value: number) => Math.min(2, Math.max(0.6, Number(value.toFixed(2))));
+  const zoomIn = () => setZoomLevel((current) => clampZoom(current + 0.2));
+  const zoomOut = () => setZoomLevel((current) => clampZoom(current - 0.2));
+  const resetZoom = () => setZoomLevel(1);
+  const contentScale = diagramScale * zoomLevel;
 
   useLayoutEffect(() => {
     const updateScale = () => {
@@ -201,19 +208,52 @@ export const WebArchitectureDiagram: React.FC<WebArchitectureDiagramProps> = ({
     const observer = new ResizeObserver(updateConnections);
     if (canvasRef.current) observer.observe(canvasRef.current);
     return () => observer.disconnect();
-  }, [canvasHeight, diagramScale, positions, relationships]);
+  }, [canvasHeight, contentScale, positions, relationships]);
 
   return (
     <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 overflow-hidden">
-      <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-800 text-[10px] text-slate-400">
-        <GitBranch className="w-3.5 h-3.5 text-indigo-400" />
-        <span>Related modules are clustered together; labelled connectors match the UML relationships.</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-3 py-2 text-[10px] text-slate-400">
+        <div className="flex items-center gap-2">
+          <GitBranch className="w-3.5 h-3.5 text-indigo-400" />
+          <span>Related modules are clustered together; labelled connectors match the UML relationships.</span>
+        </div>
+        <div className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 p-1 text-[11px] text-slate-300">
+          <button
+            type="button"
+            onClick={zoomOut}
+            className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300"
+            aria-label="Zoom out web architecture diagram"
+            title="Zoom out"
+          >
+            <ZoomOut className="h-3.5 w-3.5" />
+          </button>
+          <span className="min-w-12 px-1 text-center font-mono">{Math.round(contentScale * 100)}%</span>
+          <button
+            type="button"
+            onClick={zoomIn}
+            className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300"
+            aria-label="Zoom in web architecture diagram"
+            title="Zoom in"
+          >
+            <ZoomIn className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            onClick={resetZoom}
+            className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300"
+            aria-label="Reset web architecture zoom"
+            title="Reset zoom"
+          >
+            <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        </div>
       </div>
-      <div ref={frameRef} className="w-full overflow-hidden" style={{ height: canvasHeight * diagramScale }}>
+      <div ref={frameRef} className="w-full overflow-auto" style={{ maxHeight: '78vh' }}>
+        <div style={{ width: 1280 * contentScale, height: canvasHeight * contentScale }}>
       <div
         ref={canvasRef}
         className="relative w-[1280px]"
-        style={{ height: canvasHeight, transform: `scale(${diagramScale})`, transformOrigin: 'top left' }}
+        style={{ height: canvasHeight, transform: `scale(${contentScale})`, transformOrigin: 'top left' }}
       >
         <div className="absolute inset-x-0 top-2 grid grid-cols-4 px-4 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-600">
           {GROUPS.map((group) => <span key={group.name}>{group.name}</span>)}
@@ -274,6 +314,7 @@ export const WebArchitectureDiagram: React.FC<WebArchitectureDiagramProps> = ({
           );
         })}
       </div>
+        </div>
       </div>
     </div>
   );

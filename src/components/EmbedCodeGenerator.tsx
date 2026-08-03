@@ -512,14 +512,20 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 .repo-card__diagram-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
 .repo-card__tab-btn { border: 1px solid #334155; background: #0b1220; color: #94a3b8; border-radius: 8px; font-size: 11px; font-weight: 600; padding: 6px 10px; cursor: pointer; }
 .repo-card__tab-btn.is-active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
+.repo-card__diagram-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; padding: 8px 10px; border: 1px solid #1e293b; border-radius: 10px; background: rgba(15, 23, 42, 0.9); color: #cbd5e1; font-size: 11px; }
+.repo-card__diagram-toolbar-actions { display: flex; align-items: center; gap: 4px; border: 1px solid #1e293b; border-radius: 8px; background: #0f172a; padding: 4px; }
+.repo-card__diagram-toolbar button { border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.repo-card__diagram-toolbar-btn { min-width: 28px; height: 28px; border-radius: 6px; border: 1px solid transparent !important; }
+.repo-card__diagram-toolbar-btn:hover { background: #1e293b; color: #fde047; }
+.repo-card__diagram-toolbar-value { min-width: 44px; text-align: center; font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; }
 .repo-card__diagram-pane { border: 1px solid #1e293b; background: #020617; border-radius: 10px; padding: 10px; }
 .repo-card__diagram-pane.is-hidden { display: none; }
-.repo-card__diagram-mermaid { overflow-x: auto; background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 8px; }
-.repo-card__web-diagram { width: 100%; overflow-x: auto; }
+.repo-card__diagram-mermaid { overflow: auto; background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 8px; max-height: 72vh; }
+.repo-card__web-diagram { width: 100%; overflow: auto; }
 .repo-card__web-shell { border: 1px solid #334155; border-radius: 10px; background: rgba(2, 6, 23, 0.75); overflow: hidden; }
 .repo-card__web-legend { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 10px; color: #94a3b8; }
 .repo-card__web-legend-dot { width: 8px; height: 8px; border-radius: 999px; background: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
-.repo-card__web-frame { width: 100%; overflow-x: auto; }
+.repo-card__web-frame { width: 100%; overflow: auto; max-height: 78vh; }
 .repo-card__web-canvas { position: relative; width: 1240px; }
 .repo-card__web-lanes { position: absolute; left: 0; right: 0; top: 6px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 0 20px; text-align: center; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #475569; z-index: 3; }
 .repo-card__web-svg { position: absolute; inset: 0; width: 1240px; pointer-events: none; z-index: 1; }
@@ -669,7 +675,11 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
     }).join('');
   }
 
-  function renderWebArchitecture(el, data) {
+  function clampZoom(value) {
+    return Math.min(2, Math.max(0.6, Number(value.toFixed(2))));
+  }
+
+  function renderWebArchitecture(el, data, zoomLevel) {
     var container = el.querySelector('[data-web-container]');
     if (!container) return;
 
@@ -787,11 +797,21 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       '</a>';
     }).join('');
 
+    var scale = zoomLevel || 1;
     container.innerHTML =
+      '<div class="repo-card__diagram-toolbar">' +
+        '<span>Scroll to navigate the diagram canvas.</span>' +
+        '<div class="repo-card__diagram-toolbar-actions">' +
+          '<button type="button" class="repo-card__diagram-toolbar-btn" data-zoom-out-web aria-label="Zoom out web architecture diagram" title="Zoom out">-</button>' +
+          '<span class="repo-card__diagram-toolbar-value" data-zoom-value-web>' + Math.round(scale * 100) + '%</span>' +
+          '<button type="button" class="repo-card__diagram-toolbar-btn" data-zoom-in-web aria-label="Zoom in web architecture diagram" title="Zoom in">+</button>' +
+          '<button type="button" class="repo-card__diagram-toolbar-btn" data-zoom-reset-web aria-label="Reset web architecture zoom" title="Reset zoom">↺</button>' +
+        '</div>' +
+      '</div>' +
       '<div class="repo-card__web-shell">' +
         '<div class="repo-card__web-legend"><span class="repo-card__web-legend-dot"></span><span>Modules are clustered by concern, with labeled UML relationships between lanes.</span></div>' +
         '<div class="repo-card__web-frame">' +
-          '<div class="repo-card__web-canvas" style="height:' + maxY + 'px;">' +
+          '<div class="repo-card__web-canvas" style="height:' + (maxY * scale) + 'px; transform: scale(' + scale + '); transform-origin: top left;">' +
             '<div class="repo-card__web-lanes">' + groups.map(function (g) { return '<span>' + esc(g.name) + '</span>'; }).join('') + '</div>' +
             '<svg class="repo-card__web-svg" width="' + canvasWidth + '" height="' + maxY + '" aria-hidden="true">' +
               '<defs><marker id="repo-card-arch-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="context-stroke"></path></marker></defs>' +
@@ -803,7 +823,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       '</div>';
   }
 
-  function bindDiagramUi(el, data) {
+  function bindDiagramUi(el, data, state) {
     var buttons = el.querySelectorAll('[data-diagram-tab]');
     var panes = el.querySelectorAll('[data-diagram-pane]');
     function setActive(tab) {
@@ -815,8 +835,8 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         var on = pane.getAttribute('data-diagram-pane') === tab;
         pane.classList.toggle('is-hidden', !on);
       });
-      if (tab === 'mermaid') renderMermaid(el, data.diagrams.mermaidCode || '');
-      if (tab === 'web') renderWebArchitecture(el, data);
+      if (tab === 'mermaid') renderMermaid(el, data.diagrams.mermaidCode || '', state.mermaidZoom);
+      if (tab === 'web') renderWebArchitecture(el, data, state.webZoom);
     }
     buttons.forEach(function (btn) {
       btn.addEventListener('click', function () { setActive(btn.getAttribute('data-diagram-tab')); });
@@ -824,7 +844,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
     setActive('web');
   }
 
-  function renderMermaid(el, code) {
+  function renderMermaid(el, code, zoomLevel) {
     var container = el.querySelector('[data-mermaid-container]');
     var error = el.querySelector('[data-mermaid-error]');
     if (!container) return;
@@ -855,9 +875,11 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         container.innerHTML = result.svg;
         var svg = container.querySelector('svg');
         if (svg) {
-          svg.style.width = '100%';
+          svg.style.width = ((zoomLevel || 1) * 100) + '%';
+          svg.style.maxWidth = 'none';
           svg.style.height = 'auto';
           svg.style.display = 'block';
+          svg.style.transformOrigin = 'top left';
         }
       }).catch(function (err) {
         if (error) error.textContent = 'Mermaid render failed: ' + (err && err.message ? err.message : 'unknown error');
@@ -868,6 +890,40 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
   }
 
   function renderCard(el, d) {
+    var state = el.__diagramState || { mermaidZoom: 1, webZoom: 1 };
+    el.__diagramState = state;
+    el.__diagramData = d;
+
+    function refreshDiagram() {
+      var currentState = el.__diagramState || state;
+      var currentData = el.__diagramData || d;
+      var activeTab = el.querySelector('[data-diagram-tab].is-active');
+      if (!activeTab) return;
+      var tab = activeTab.getAttribute('data-diagram-tab');
+      if (tab === 'mermaid') renderMermaid(el, currentData.diagrams.mermaidCode || '', currentState.mermaidZoom);
+      if (tab === 'web') renderWebArchitecture(el, currentData, currentState.webZoom);
+      var mermaidValue = el.querySelector('[data-zoom-value-mermaid]');
+      if (mermaidValue) mermaidValue.textContent = Math.round(currentState.mermaidZoom * 100) + '%';
+      var webValue = el.querySelector('[data-zoom-value-web]');
+      if (webValue) webValue.textContent = Math.round(currentState.webZoom * 100) + '%';
+    }
+
+    if (!el.__diagramControlsBound) {
+      el.__diagramControlsBound = true;
+      el.addEventListener('click', function (event) {
+        var target = event.target.closest('[data-zoom-out-mermaid], [data-zoom-in-mermaid], [data-zoom-reset-mermaid], [data-zoom-out-web], [data-zoom-in-web], [data-zoom-reset-web]');
+        if (!target) return;
+        var currentState = el.__diagramState || state;
+        if (target.hasAttribute('data-zoom-out-mermaid')) currentState.mermaidZoom = clampZoom(currentState.mermaidZoom - 0.2);
+        if (target.hasAttribute('data-zoom-in-mermaid')) currentState.mermaidZoom = clampZoom(currentState.mermaidZoom + 0.2);
+        if (target.hasAttribute('data-zoom-reset-mermaid')) currentState.mermaidZoom = 1;
+        if (target.hasAttribute('data-zoom-out-web')) currentState.webZoom = clampZoom(currentState.webZoom - 0.2);
+        if (target.hasAttribute('data-zoom-in-web')) currentState.webZoom = clampZoom(currentState.webZoom + 0.2);
+        if (target.hasAttribute('data-zoom-reset-web')) currentState.webZoom = 1;
+        refreshDiagram();
+      });
+    }
+
     el.className = 'repo-card';
     el.innerHTML =
       '<div class="repo-card__top-links">' +
@@ -897,6 +953,15 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
           '<button class="repo-card__tab-btn" data-diagram-tab="web">Interactive Web</button>' +
         '</div>' +
         '<div class="repo-card__diagram-pane" data-diagram-pane="mermaid">' +
+          '<div class="repo-card__diagram-toolbar">' +
+            '<span>Scroll to navigate the diagram canvas.</span>' +
+            '<div class="repo-card__diagram-toolbar-actions">' +
+              '<button type="button" class="repo-card__diagram-toolbar-btn" data-zoom-out-mermaid aria-label="Zoom out Mermaid diagram" title="Zoom out">-</button>' +
+              '<span class="repo-card__diagram-toolbar-value" data-zoom-value-mermaid>100%</span>' +
+              '<button type="button" class="repo-card__diagram-toolbar-btn" data-zoom-in-mermaid aria-label="Zoom in Mermaid diagram" title="Zoom in">+</button>' +
+              '<button type="button" class="repo-card__diagram-toolbar-btn" data-zoom-reset-mermaid aria-label="Reset Mermaid zoom" title="Reset zoom">↺</button>' +
+            '</div>' +
+          '</div>' +
           '<p class="repo-card__diagram-error" data-mermaid-error></p>' +
           '<div class="repo-card__diagram-mermaid" data-mermaid-container></div>' +
         '</div>' +
@@ -924,7 +989,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       '<div class="repo-card__tags">' +
         (d.repo.topics || []).slice(0, 12).map(function (topic) { return '<span class="repo-card__tag">#' + esc(topic) + '</span>'; }).join('') +
       '</div>';
-    bindDiagramUi(el, d);
+    bindDiagramUi(el, d, state);
   }
 
   function renderRepoCard(repoSlug, selector) {
@@ -1292,6 +1357,13 @@ ${js}
       const [connections, setConnections] = useState([]);
       const [canvasSize, setCanvasSize] = useState({ width: 1280, height: canvasHeight });
       const [diagramScale, setDiagramScale] = useState(1);
+      const [zoomLevel, setZoomLevel] = useState(1);
+
+      const clampZoom = (value) => Math.min(2, Math.max(0.6, Number(value.toFixed(2))));
+      const zoomIn = () => setZoomLevel((current) => clampZoom(current + 0.2));
+      const zoomOut = () => setZoomLevel((current) => clampZoom(current - 0.2));
+      const resetZoom = () => setZoomLevel(1);
+      const contentScale = diagramScale * zoomLevel;
 
       useLayoutEffect(() => {
         const updateScale = () => {
@@ -1339,17 +1411,32 @@ ${js}
             ...getRelationStyle(relationship),
           }];
         }));
-      }, [canvasHeight, classes, positions, relationships]);
+      }, [canvasHeight, contentScale, classes, positions, relationships]);
 
       return (
         <div className="border border-slate-700/70 overflow-hidden" style={{ backgroundColor: DIAGRAM_THEME.background }}>
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-slate-800 text-[10px]" style={{ color: DIAGRAM_THEME.headerText }}>
-            <span className="inline-block w-2 h-2" style={{ backgroundColor: DIAGRAM_THEME.labelText }} />
-            <span>Hybrid React renderer. Branch: {defaultBranch}. Connectors and lanes match the in-app architecture logic.</span>
+          <div className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 border-b border-slate-800 text-[10px]" style={{ color: DIAGRAM_THEME.headerText }}>
+            <div className="flex items-center gap-2">
+              <span className="inline-block w-2 h-2" style={{ backgroundColor: DIAGRAM_THEME.labelText }} />
+              <span>Hybrid React renderer. Branch: {defaultBranch}. Connectors and lanes match the in-app architecture logic.</span>
+            </div>
+            <div className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 p-1 text-[11px] text-slate-300">
+              <button type="button" onClick={zoomOut} className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Zoom out web architecture diagram" title="Zoom out">
+                <span aria-hidden="true">-</span>
+              </button>
+              <span className="min-w-12 px-1 text-center font-mono">{Math.round(contentScale * 100)}%</span>
+              <button type="button" onClick={zoomIn} className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Zoom in web architecture diagram" title="Zoom in">
+                <span aria-hidden="true">+</span>
+              </button>
+              <button type="button" onClick={resetZoom} className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Reset web architecture zoom" title="Reset zoom">
+                ↺
+              </button>
+            </div>
           </div>
 
-          <div ref={frameRef} className="w-full overflow-hidden" style={{ height: canvasHeight * diagramScale, backgroundColor: DIAGRAM_THEME.background }}>
-            <div className="relative w-[1280px]" style={{ height: canvasHeight, transform: 'scale(' + diagramScale + ')', transformOrigin: 'top left' }}>
+          <div ref={frameRef} className="w-full overflow-auto" style={{ maxHeight: '78vh', backgroundColor: DIAGRAM_THEME.background }}>
+            <div style={{ width: 1280 * contentScale, height: canvasHeight * contentScale }}>
+            <div className="relative w-[1280px]" style={{ height: canvasHeight, transform: 'scale(' + contentScale + ')', transformOrigin: 'top left' }}>
               <div className="absolute inset-x-0 top-2 grid grid-cols-4 px-4 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: DIAGRAM_THEME.headerText }}>
                 {GROUPS.map((group) => <span key={group.name}>{group.name}</span>)}
               </div>
@@ -1380,7 +1467,8 @@ ${js}
                   </g>
                 ))}
               </svg>
-
+              </div>
+              </div>
               {classes.map((umlClass) => {
                 const position = positions[umlClass.id];
                 const members = [...(umlClass.attributes || []), ...(umlClass.methods || [])];
@@ -1416,7 +1504,13 @@ ${js}
     function RepoCard() {
       const [activeDiagram, setActiveDiagram] = useState('web');
       const [mermaidError, setMermaidError] = useState('');
+      const [mermaidZoom, setMermaidZoom] = useState(1);
       const mermaidContainerRef = useRef(null);
+
+      const clampZoom = (value) => Math.min(2, Math.max(0.6, Number(value.toFixed(2))));
+      const zoomInMermaid = () => setMermaidZoom((current) => clampZoom(current + 0.2));
+      const zoomOutMermaid = () => setMermaidZoom((current) => clampZoom(current - 0.2));
+      const resetMermaidZoom = () => setMermaidZoom(1);
 
       useEffect(() => {
         if (activeDiagram !== 'mermaid') return;
@@ -1451,9 +1545,11 @@ ${js}
             mermaidContainerRef.current.innerHTML = result.svg;
             const svg = mermaidContainerRef.current.querySelector('svg');
             if (svg) {
-              svg.style.width = '100%';
+              svg.style.width = (mermaidZoom * 100) + '%';
+              svg.style.maxWidth = 'none';
               svg.style.height = 'auto';
               svg.style.display = 'block';
+              svg.style.transformOrigin = 'top left';
             }
           }).catch((err) => {
             setMermaidError('Mermaid render failed: ' + (err && err.message ? err.message : 'unknown error'));
@@ -1461,7 +1557,7 @@ ${js}
         } catch (err) {
           setMermaidError('Mermaid render failed: ' + (err && err.message ? err.message : 'unknown error'));
         }
-      }, [activeDiagram]);
+      }, [activeDiagram, mermaidZoom]);
 
       const totalLanguageBytes = data.languages.reduce((sum, item) => sum + item.bytes, 0);
 
@@ -1520,8 +1616,17 @@ ${js}
 
               {activeDiagram === 'mermaid' && (
                 <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-2 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-[11px] text-slate-300">
+                    <span>Scroll to navigate the diagram canvas.</span>
+                    <div className="flex items-center gap-1">
+                      <button type="button" onClick={zoomOutMermaid} className="rounded-md border border-slate-700 px-2 py-1 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Zoom out Mermaid diagram">-</button>
+                      <span className="min-w-12 px-1 text-center font-mono">{Math.round(mermaidZoom * 100)}%</span>
+                      <button type="button" onClick={zoomInMermaid} className="rounded-md border border-slate-700 px-2 py-1 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Zoom in Mermaid diagram">+</button>
+                      <button type="button" onClick={resetMermaidZoom} className="rounded-md border border-slate-700 px-2 py-1 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Reset Mermaid zoom">↺</button>
+                    </div>
+                  </div>
                   {mermaidError && <p className="text-xs text-rose-300 bg-rose-950/40 border border-rose-800 rounded-lg p-2">{mermaidError}</p>}
-                  <div ref={mermaidContainerRef} className="w-full overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 text-slate-100 p-2" />
+                  <div ref={mermaidContainerRef} className="w-full overflow-auto rounded-lg border border-slate-700 bg-slate-950 text-slate-100 p-2" style={{ maxHeight: '72vh' }} />
                 </div>
               )}
 
