@@ -20,12 +20,15 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ chart, className
           securityLevel: 'strict',
           theme: 'base',
           themeVariables: {
-            background: '#0f172a',
-            primaryColor: '#d1d5db',
-            primaryTextColor: '#000000',
-            lineColor: '#cbd5e1',
-            tertiaryColor: '#e5e7eb',
-            tertiaryTextColor: '#000000',
+            background: '#020617',
+            primaryColor: '#0f172a',
+            primaryTextColor: '#e0e7ff',
+            primaryBorderColor: '#818cf8',
+            lineColor: '#818cf8',
+            secondaryColor: '#1e293b',
+            secondaryTextColor: '#cbd5e1',
+            tertiaryColor: '#1e293b',
+            tertiaryTextColor: '#cbd5e1',
           },
         });
 
