@@ -90,7 +90,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ chart, className
     <div className={className}>
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-semibold text-slate-300">Mermaid Diagram</p>
-        <div className="flex items-center gap-1 rounded-lg border border-slate-700 bg-slate-950/90 p-1 text-[11px] text-slate-300">
+        <div className="flex items-center gap-1 border border-slate-700 bg-slate-950/90 p-1 text-[11px] text-slate-300">
           <button
             type="button"
             onClick={zoomOut}
@@ -123,7 +123,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ chart, className
       </div>
       <div
         ref={containerRef}
-        className="w-full overflow-auto rounded-lg border border-slate-700/70 bg-slate-950 text-slate-100"
+        className="w-full overflow-auto border border-slate-700/70 bg-slate-950 text-slate-100"
         style={{ maxHeight: '72vh' }}
         aria-label="Repository architecture Mermaid diagram"
       />

@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
         
         {/* Logo & Title & Wrapped Subtitle */}
         <div className="flex items-start gap-3 shrink-0 lg:max-w-xs">
-          <div className="p-2.5 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-xl text-white shadow-lg shadow-indigo-500/20 shrink-0 mt-0.5">
+          <div className="p-2.5 bg-[#eab308] text-slate-950 shrink-0 mt-0.5">
             <Github className="w-6 h-6" />
           </div>
           <div>
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({
               <h1 className="font-bold text-slate-100 text-base tracking-tight">
                 GitHub Repo Presenter
               </h1>
-              <span className="px-2 py-0.5 text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-md shrink-0">
+              <span className="px-2 py-0.5 text-[10px] font-semibold bg-[#eab308]/10 text-[#eab308] border border-[#eab308]/20 shrink-0">
                 v2.0
               </span>
             </div>
@@ -75,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
                 onChange={(e) => setInputVal(e.target.value)}
                 onFocus={(e) => e.target.select()}
                 placeholder="Paste GitHub repository URL or owner/repo"
-                className="w-full bg-slate-900 border border-slate-700/80 rounded-xl pl-9 pr-8 py-2.5 text-xs text-slate-100 font-mono placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all shadow-inner"
+                className="w-full bg-slate-900 border border-slate-700/80 pl-9 pr-8 py-2.5 text-xs text-slate-100 font-mono placeholder-slate-500 focus:outline-none focus:border-[#eab308] transition-all shadow-inner"
               />
               {inputVal && (
                 <button
@@ -92,7 +92,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-md shadow-indigo-600/20 shrink-0 min-w-[90px]"
+              className="px-4 py-2.5 bg-[#eab308] hover:bg-[#facc15] text-slate-950 text-xs font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5 shrink-0 min-w-[90px]"
             >
               {isLoading ? (
                 <>
@@ -112,7 +112,7 @@ export const Header: React.FC<HeaderProps> = ({
               onChange={(e) => {
                 if (e.target.value) handleSelectFeatured(e.target.value);
               }}
-              className="w-full bg-slate-900 border border-slate-700/80 text-slate-300 text-xs rounded-xl px-3 py-2.5 focus:outline-none focus:border-indigo-500 cursor-pointer"
+              className="w-full bg-slate-900 border border-slate-700/80 text-slate-300 text-xs px-3 py-2.5 focus:outline-none focus:border-[#eab308] cursor-pointer"
             >
               <option value="" disabled>Sample Repos ▾</option>
               {FEATURED_REPOS.map((item) => (
@@ -125,12 +125,12 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Presentation View Selector */}
-        <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 rounded-xl shrink-0 justify-center">
+        <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 p-1 shrink-0 justify-center">
           <button
             onClick={() => onModeChange('showcase')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 text-xs font-medium transition-all flex items-center gap-1.5 ${
               activeMode === 'showcase'
-                ? 'bg-indigo-600 text-white shadow-sm'
+                ? 'bg-[#eab308] text-slate-950'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
@@ -140,9 +140,9 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onModeChange('card-embed')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 text-xs font-medium transition-all flex items-center gap-1.5 ${
               activeMode === 'card-embed'
-                ? 'bg-indigo-600 text-white shadow-sm'
+                ? 'bg-[#eab308] text-slate-950'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >
@@ -152,9 +152,9 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onModeChange('docs')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 text-xs font-medium transition-all flex items-center gap-1.5 ${
               activeMode === 'docs'
-                ? 'bg-indigo-600 text-white shadow-sm'
+                ? 'bg-[#eab308] text-slate-950'
                 : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
             }`}
           >

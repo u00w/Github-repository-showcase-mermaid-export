@@ -176,7 +176,7 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
         {/* Header */}
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-slate-800 bg-slate-950/80 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-600/30 border border-indigo-500/40 rounded-xl text-indigo-400">
+            <div className="p-2 bg-[#eab308]/20 border border-[#eab308]/40 text-[#eab308]">
               <Box className="w-5 h-5" />
             </div>
             <div>
@@ -186,7 +186,7 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
               <p className="text-[11px] text-slate-500 font-mono">{repo.full_name}</p>
             </div>
             {isAiGenerated && (
-              <span className="px-2 py-0.5 text-[10px] bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 rounded-full font-mono">AI</span>
+              <span className="px-2 py-0.5 text-[10px] bg-[#eab308]/20 border border-[#eab308]/40 text-[#eab308] font-mono">AI</span>
             )}
           </div>
 
@@ -194,14 +194,14 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
             <button
               onClick={() => loadDiagram()}
               disabled={isLoading}
-              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors flex items-center gap-1.5"
+              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors flex items-center gap-1.5"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-indigo-400' : ''}`} />
               <span>Reanalyze</span>
             </button>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 transition-colors border border-slate-700/60"
+              className="p-1.5 bg-slate-800/80 hover:bg-rose-500/20 hover:text-rose-400 text-slate-400 transition-colors border border-slate-700/60"
             >
               <X className="w-5 h-5" />
             </button>
@@ -210,7 +210,7 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
 
         {/* Tabs & search/zoom */}
         <div className="bg-slate-950/40 border-b border-slate-800 px-5 py-2 flex flex-wrap items-center justify-between gap-3 shrink-0">
-          <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+          <div className="flex items-center gap-1 bg-slate-900 p-1 border border-slate-800">
             {([
               { key: 'visual',   icon: Box,      label: 'Class Diagram' },
               { key: 'mermaid',  icon: Code,     label: 'Mermaid' },
@@ -220,8 +220,8 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 ${
-                  activeTab === key ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
+                className={`px-3 py-1.5 text-xs font-medium transition-all flex items-center gap-1.5 ${
+                  activeTab === key ? 'bg-[#eab308] text-slate-950' : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />
@@ -239,10 +239,10 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Filter nodes..."
-                  className="bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-2 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-32 sm:w-40"
+                  className="bg-slate-900 border border-slate-800 pl-8 pr-2 py-1 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-[#eab308] w-32 sm:w-40"
                 />
               </div>
-              <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-lg border border-slate-800">
+              <div className="flex items-center gap-1 bg-slate-900 p-1 border border-slate-800">
                 <button onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))} className="p-1 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded">
                   <ZoomOut className="w-3.5 h-3.5" />
                 </button>
@@ -260,7 +260,7 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
 
           {isLoading && (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-3 bg-slate-950/80 backdrop-blur-sm z-30">
-              <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+              <Loader2 className="w-8 h-8 text-[#eab308] animate-spin" />
               <div className="space-y-1">
                 <h3 className="text-sm font-semibold text-slate-200">Building UML Architecture Model…</h3>
                 <p className="text-xs text-slate-400">Synthesizing source files, dependencies, and component subsystems.</p>
@@ -390,7 +390,7 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
                         onMouseDown={(e) => handleMouseDownNode(e, cls.id)}
                         onClick={() => setSelectedClassId(isSelected ? null : cls.id)}
                         style={{ position: 'absolute', left: `${pos.x}px`, top: `${pos.y}px` }}
-                        className={`w-72 bg-[#2d2d3a] border-2 rounded-xl shadow-2xl transition-all overflow-hidden cursor-move ${
+                        className={`w-72 bg-[#2d2d3a] border-2 shadow-2xl transition-all overflow-hidden cursor-move ${
                           isSelected
                             ? 'border-indigo-400 ring-4 ring-indigo-500/20 shadow-indigo-500/20'
                             : 'border-slate-600/90 hover:border-slate-400'
@@ -450,13 +450,13 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
                 </div>
                 <button
                   onClick={() => handleCopy(diagram.mermaidCode || '', 'mermaid')}
-                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 bg-[#eab308] hover:bg-[#facc15] text-slate-950 text-xs font-medium transition-colors flex items-center gap-1.5"
                 >
                   {copiedType === 'mermaid' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedType === 'mermaid' ? 'Copied!' : 'Copy Mermaid'}</span>
                 </button>
               </div>
-              <pre className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-indigo-300 overflow-x-auto leading-relaxed shadow-inner">
+              <pre className="p-4 bg-slate-950 border border-slate-800 text-xs font-mono text-[#eab308] overflow-x-auto leading-relaxed shadow-inner">
                 {diagram.mermaidCode}
               </pre>
             </div>
@@ -472,13 +472,13 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
                 </div>
                 <button
                   onClick={() => handleCopy(diagram.plantUmlCode || '', 'plantuml')}
-                  className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 bg-[#eab308] hover:bg-[#facc15] text-slate-950 text-xs font-medium transition-colors flex items-center gap-1.5"
                 >
                   {copiedType === 'plantuml' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedType === 'plantuml' ? 'Copied!' : 'Copy PlantUML'}</span>
                 </button>
               </div>
-              <pre className="p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs font-mono text-purple-300 overflow-x-auto leading-relaxed shadow-inner">
+              <pre className="p-4 bg-slate-950 border border-slate-800 text-xs font-mono text-[#eab308] overflow-x-auto leading-relaxed shadow-inner">
                 {diagram.plantUmlCode}
               </pre>
             </div>
@@ -491,7 +491,7 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
                 <h3 className="text-sm font-bold text-slate-200">Architectural Class Inventory</h3>
                 <p className="text-xs text-slate-400">Complete listing of classes, packages, attributes, and operations.</p>
               </div>
-              <div className="overflow-x-auto border border-slate-800 rounded-xl bg-slate-900">
+              <div className="overflow-x-auto border border-slate-800 bg-slate-900">
                 <table className="w-full text-left text-xs text-slate-300">
                   <thead className="bg-slate-950 text-slate-400 text-[11px] uppercase tracking-wider border-b border-slate-800">
                     <tr>
@@ -540,7 +540,7 @@ export const UmlClassDiagramModal: React.FC<UmlClassDiagramModalProps> = ({
           </div>
           <button
             onClick={() => handleCopy(JSON.stringify(diagram, null, 2), 'json')}
-            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium border border-slate-700 transition-colors flex items-center gap-1.5"
+            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 transition-colors flex items-center gap-1.5"
           >
             {copiedType === 'json' ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
             <span>Export JSON</span>

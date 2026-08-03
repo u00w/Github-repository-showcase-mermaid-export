@@ -85,6 +85,12 @@ const getRelationStyle = (relationship: UmlRelationship) => {
   return { color: '#818cf8', labelBackground: '#0f172a', labelBorder: '#475569' };
 };
 
+const getRelationshipId = (relationship: UmlRelationship, index: number) => {
+  const fallbackParts = [relationship.fromId, relationship.toId, relationship.type, relationship.label, index]
+    .filter((value): value is string | number => value !== undefined && value !== null && value !== '');
+  return relationship.id || fallbackParts.join('-');
+};
+
 const createOrthogonalPath = (
   source: DOMRect,
   target: DOMRect,
@@ -195,7 +201,7 @@ export const WebArchitectureDiagram: React.FC<WebArchitectureDiagramProps> = ({
           index,
         );
         return [{
-          id: relationship.id,
+          id: getRelationshipId(relationship, index),
           ...route,
           label: relationship.label || relationship.type,
           dashed: relationship.type === 'dependency' || relationship.type === 'realization',
@@ -211,17 +217,17 @@ export const WebArchitectureDiagram: React.FC<WebArchitectureDiagramProps> = ({
   }, [canvasHeight, contentScale, positions, relationships]);
 
   return (
-    <div className="rounded-lg border border-slate-700/70 bg-slate-950/70 overflow-hidden">
+    <div className="border border-slate-700/70 bg-slate-950/70 overflow-hidden">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 px-3 py-2 text-[10px] text-slate-400">
         <div className="flex items-center gap-2">
-          <GitBranch className="w-3.5 h-3.5 text-indigo-400" />
+          <GitBranch className="w-3.5 h-3.5 text-[#eab308]" />
           <span>Related modules are clustered together; labelled connectors match the UML relationships.</span>
         </div>
         <div className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 p-1 text-[11px] text-slate-300">
           <button
             type="button"
             onClick={zoomOut}
-            className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300"
+            className="p-1.5 transition hover:bg-slate-800 hover:text-yellow-300"
             aria-label="Zoom out web architecture diagram"
             title="Zoom out"
           >
@@ -231,7 +237,7 @@ export const WebArchitectureDiagram: React.FC<WebArchitectureDiagramProps> = ({
           <button
             type="button"
             onClick={zoomIn}
-            className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300"
+            className="p-1.5 transition hover:bg-slate-800 hover:text-yellow-300"
             aria-label="Zoom in web architecture diagram"
             title="Zoom in"
           >
@@ -240,7 +246,7 @@ export const WebArchitectureDiagram: React.FC<WebArchitectureDiagramProps> = ({
           <button
             type="button"
             onClick={resetZoom}
-            className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300"
+            className="p-1.5 transition hover:bg-slate-800 hover:text-yellow-300"
             aria-label="Reset web architecture zoom"
             title="Reset zoom"
           >
@@ -250,70 +256,70 @@ export const WebArchitectureDiagram: React.FC<WebArchitectureDiagramProps> = ({
       </div>
       <div ref={frameRef} className="w-full overflow-auto" style={{ maxHeight: '78vh' }}>
         <div style={{ width: 1280 * contentScale, height: canvasHeight * contentScale }}>
-      <div
-        ref={canvasRef}
-        className="relative w-[1280px]"
-        style={{ height: canvasHeight, transform: `scale(${contentScale})`, transformOrigin: 'top left' }}
-      >
-        <div className="absolute inset-x-0 top-2 grid grid-cols-4 px-4 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-600">
-          {GROUPS.map((group) => <span key={group.name}>{group.name}</span>)}
-        </div>
-        <svg className="absolute inset-0 pointer-events-none" width={canvasSize.width} height={canvasSize.height} aria-hidden="true">
-          <defs>
-            <marker id="architecture-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-              <path d="M0,0 L0,6 L6,3 z" fill="context-stroke" />
-            </marker>
-          </defs>
-          {connections.map((connection) => (
-            <g key={connection.id}>
-              <path d={connection.path} fill="none" stroke="#020617" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-              <path d={connection.path} fill="none" stroke={connection.color} strokeWidth="1.5" strokeDasharray={connection.dashed ? '5 4' : undefined}
-                strokeLinecap="round" strokeLinejoin="round" opacity="0.8" markerEnd="url(#architecture-arrow)" />
-              <rect
-                x={connection.labelX - (connection.label.length * 2.9 + 5)}
-                y={connection.labelY - 7}
-                width={connection.label.length * 5.8 + 10}
-                height="14"
-                rx="4"
-                fill={connection.labelBackground}
-                stroke={connection.labelBorder}
-              />
-              <text x={connection.labelX} y={connection.labelY} textAnchor="middle" dominantBaseline="middle" className="fill-slate-100 text-[9px]">
-                {connection.label}
-              </text>
-            </g>
-          ))}
-        </svg>
+          <div
+            ref={canvasRef}
+            className="relative w-[1280px]"
+            style={{ height: canvasHeight, transform: `scale(${contentScale})`, transformOrigin: 'top left' }}
+          >
+            <div className="absolute inset-x-0 top-2 grid grid-cols-4 px-4 text-center text-[10px] font-semibold uppercase tracking-wider text-slate-600">
+              {GROUPS.map((group) => <span key={group.name}>{group.name}</span>)}
+            </div>
+            <svg className="absolute inset-0 pointer-events-none" width={canvasSize.width} height={canvasSize.height} aria-hidden="true">
+              <defs>
+                <marker id="architecture-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                  <path d="M0,0 L0,6 L6,3 z" fill="context-stroke" />
+                </marker>
+              </defs>
+              {connections.map((connection) => (
+                <g key={connection.id}>
+                  <path d={connection.path} fill="none" stroke="#020617" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d={connection.path} fill="none" stroke={connection.color} strokeWidth="1.5" strokeDasharray={connection.dashed ? '5 4' : undefined}
+                    strokeLinecap="round" strokeLinejoin="round" opacity="0.8" markerEnd="url(#architecture-arrow)" />
+                  <rect
+                    x={connection.labelX - (connection.label.length * 2.9 + 5)}
+                    y={connection.labelY - 7}
+                    width={connection.label.length * 5.8 + 10}
+                    height="14"
+                    rx="4"
+                    fill={connection.labelBackground}
+                    stroke={connection.labelBorder}
+                  />
+                  <text x={connection.labelX} y={connection.labelY} textAnchor="middle" dominantBaseline="middle" className="fill-slate-100 text-[9px]">
+                    {connection.label}
+                  </text>
+                </g>
+              ))}
+            </svg>
 
-        {classes.map((umlClass) => {
-          const position = positions[umlClass.id];
-          const memberCount = umlClass.attributes.length + umlClass.methods.length;
-          return (
-            <a
-              key={umlClass.id}
-              ref={(element) => { if (element) nodeRefs.current.set(umlClass.id, element); else nodeRefs.current.delete(umlClass.id); }}
-              href={`https://github.com/${repoFullName}/search?q=${encodeURIComponent(umlClass.name)}&type=code`}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={`Find ${umlClass.name} in this repository on GitHub`}
-              className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 rounded-lg border border-indigo-400/30 bg-slate-900/95 shadow-md shadow-black/20 transition hover:z-20 hover:border-indigo-400/70 hover:bg-slate-800"
-              style={{ left: `${position.x * 100}%`, top: `${position.y}px` }}
-            >
-              <p className="px-2.5 pt-2 text-[9px] uppercase tracking-wider text-indigo-300">«{umlClass.stereotype || 'class'}»</p>
-              <div className="mt-1 flex items-center gap-1.5 border-y border-slate-700/80 px-2.5 py-1.5">
-                <span className="truncate text-xs font-bold text-indigo-100">{umlClass.name}</span>
-                <ExternalLink className="w-3 h-3 shrink-0 text-slate-500" />
-              </div>
-              {memberCount > 0 && (
-                <div className="space-y-0.5 px-2.5 py-2 font-mono text-[9px] leading-[1.35] text-slate-300">
-                  {umlClass.attributes.map((attribute) => <p key={`attribute-${attribute.name}`} className="break-words">{memberText(attribute)}</p>)}
-                  {umlClass.methods.map((method) => <p key={`method-${method.name}`} className="break-words">{memberText(method, true)}</p>)}
-                </div>
-              )}
-            </a>
-          );
-        })}
-      </div>
+            {classes.map((umlClass) => {
+              const position = positions[umlClass.id];
+              const memberCount = umlClass.attributes.length + umlClass.methods.length;
+              return (
+                <a
+                  key={umlClass.id}
+                  ref={(element) => { if (element) nodeRefs.current.set(umlClass.id, element); else nodeRefs.current.delete(umlClass.id); }}
+                  href={`https://github.com/${repoFullName}/search?q=${encodeURIComponent(umlClass.name)}&type=code`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`Find ${umlClass.name} in this repository on GitHub`}
+                  className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 border border-indigo-400/30 bg-[#6a1a41] shadow-md shadow-black/20 transition hover:z-20 hover:border-indigo-400/70 hover:bg-[#7b234f]"
+                  style={{ left: `${position.x * 100}%`, top: `${position.y}px` }}
+                >
+                  <p className="px-2.5 pt-2 text-[9px] uppercase tracking-wider text-indigo-300">«{umlClass.stereotype || 'class'}»</p>
+                  <div className="mt-1 flex items-center gap-1.5 border-y border-slate-700/80 px-2.5 py-1.5">
+                    <span className="truncate text-xs font-bold text-indigo-100">{umlClass.name}</span>
+                    <ExternalLink className="w-3 h-3 shrink-0 text-slate-500" />
+                  </div>
+                  {memberCount > 0 && (
+                    <div className="space-y-0.5 px-2.5 py-2 font-mono text-[9px] leading-[1.35] text-slate-300">
+                      {umlClass.attributes.map((attribute) => <p key={`attribute-${attribute.name}`} className="break-words">{memberText(attribute)}</p>)}
+                      {umlClass.methods.map((method) => <p key={`method-${method.name}`} className="break-words">{memberText(method, true)}</p>)}
+                    </div>
+                  )}
+                </a>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

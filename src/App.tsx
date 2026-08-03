@@ -238,9 +238,9 @@ export default function App() {
               <button
                 key={item.repoPath}
                 onClick={() => handleSearch(item.repoPath)}
-                className={`p-3 rounded-xl border text-left transition-all group ${
+                className={`p-3 border text-left transition-all group ${
                   repoData?.repo.full_name.toLowerCase() === item.repoPath.toLowerCase()
-                    ? 'bg-indigo-950/40 border-indigo-500/50 text-indigo-200'
+                    ? 'bg-[#eab308]/20 border-[#eab308]/50 text-[#eab308]'
                     : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-800/60 hover:border-slate-700'
                 }`}
               >
@@ -248,7 +248,7 @@ export default function App() {
                   <span className="text-xs font-bold text-slate-100 group-hover:text-indigo-300">
                     {item.name}
                   </span>
-                  <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-all" />
+                  <ArrowRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-[#eab308] group-hover:translate-x-0.5 transition-all" />
                 </div>
                 <span className="text-[11px] text-slate-500 font-mono block mt-0.5">
                   {item.repoPath}

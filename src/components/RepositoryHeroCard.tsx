@@ -49,7 +49,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
       textMuted: 'text-slate-600',
       badge: 'bg-slate-100 text-slate-800 border-slate-200',
       border: 'border-slate-200',
-      accentBtn: 'bg-indigo-600 hover:bg-indigo-700 text-white'
+      accentBtn: 'bg-[#eab308] hover:bg-[#facc15] text-slate-950'
     },
     'dark-emerald': {
       container: 'bg-slate-950 text-emerald-100 border-emerald-900/50 shadow-2xl shadow-emerald-950/50',
@@ -57,7 +57,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
       textMuted: 'text-emerald-300/70',
       badge: 'bg-emerald-950/80 text-emerald-300 border-emerald-800/50',
       border: 'border-emerald-900/40',
-      accentBtn: 'bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-semibold'
+      accentBtn: 'bg-[#eab308] hover:bg-[#facc15] text-slate-950 font-semibold'
     },
     'github-dark': {
       container: 'bg-[#0d1117] text-[#c9d1d9] border-[#30363d] shadow-2xl',
@@ -65,7 +65,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
       textMuted: 'text-[#8b949e]',
       badge: 'bg-[#21262d] text-[#58a6ff] border-[#30363d]',
       border: 'border-[#30363d]',
-      accentBtn: 'bg-[#238636] hover:bg-[#2ea043] text-white'
+      accentBtn: 'bg-[#eab308] hover:bg-[#facc15] text-slate-950'
     },
     'glassmorphism': {
       container: 'bg-slate-900/60 backdrop-blur-xl text-slate-100 border-slate-700/50 shadow-2xl',
@@ -73,7 +73,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
       textMuted: 'text-slate-300/80',
       badge: 'bg-white/10 text-white border-white/20',
       border: 'border-white/10',
-      accentBtn: 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-md'
+      accentBtn: 'bg-[#eab308] hover:bg-[#facc15] text-slate-950'
     },
     'cyberpunk': {
       container: 'bg-black text-cyan-300 border-pink-500/80 shadow-2xl shadow-pink-500/10',
@@ -81,7 +81,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
       textMuted: 'text-cyan-400/80',
       badge: 'bg-pink-950/80 text-pink-300 border-pink-500/40 font-mono',
       border: 'border-pink-500/30',
-      accentBtn: 'bg-pink-600 hover:bg-pink-500 text-black font-bold font-mono'
+      accentBtn: 'bg-[#eab308] hover:bg-[#facc15] text-slate-950 font-bold font-mono'
     }
   };
 
@@ -90,33 +90,11 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
   return (
     <div className="space-y-4">
       {/* Theme Toggler Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
-        <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
-          <Palette className="w-4 h-4 text-indigo-400" />
-          <span>Card Theme Preset:</span>
-        </div>
-        <div className="flex flex-wrap gap-1.5">
-          {(['modern-light', 'dark-emerald', 'github-dark', 'glassmorphism', 'cyberpunk'] as ThemeStyle[]).map((theme) => (
-            <button
-              key={theme}
-              onClick={() => onThemeChange(theme)}
-              className={`px-2.5 py-1 text-xs font-medium rounded-lg border transition-all capitalize ${
-                activeTheme === theme
-                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
-                  : 'bg-slate-950/60 text-slate-400 border-slate-800 hover:text-slate-200'
-              }`}
-            >
-              {theme.replace('-', ' ')}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Main Hero Showcase Card */}
-      <div className={`p-6 md:p-8 rounded-2xl border transition-all relative overflow-hidden ${currentTheme.container}`}>
+      <div className={`p-6 md:p-8 border transition-all relative overflow-hidden ${currentTheme.container}`}>
         
         {/* Subtle Decorative Ambient Background Glow */}
-        <div className="absolute -top-24 -right-24 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-72 h-72 bg-[#eab308]/10 blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-start justify-between gap-6">
           
@@ -128,7 +106,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
               <img
                 src={repo.owner.avatar_url}
                 alt={repo.owner.login}
-                className="w-12 h-12 rounded-xl border border-black/10 object-cover shadow-sm shrink-0"
+                className="w-12 h-12 border border-black/10 object-cover shadow-sm shrink-0"
               />
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -200,7 +178,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
               href={repo.html_url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`w-full py-2 px-4 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-transform active:scale-[0.99] ${currentTheme.accentBtn}`}
+              className={`w-full py-2 px-4 text-xs font-semibold flex items-center justify-center gap-2 transition-transform active:scale-[0.99] ${currentTheme.accentBtn}`}
             >
               <ExternalLink className="w-4 h-4" />
               View on GitHub
@@ -211,7 +189,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
                 href={repo.homepage.startsWith('http') ? repo.homepage : `https://${repo.homepage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-2 px-4 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 rounded-xl text-xs font-medium border border-slate-700 flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-2 px-4 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 text-xs font-medium border border-slate-700 flex items-center justify-center gap-2 transition-colors"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                 Live Demo Site
@@ -219,11 +197,11 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
             )}
 
             {/* Git Clone Box */}
-            <div className="bg-black/20 border border-white/10 rounded-xl p-2.5 space-y-1.5">
+            <div className="bg-black/20 border border-white/10 p-2.5 space-y-1.5">
               <span className={`text-[10px] uppercase tracking-wider font-semibold ${currentTheme.textMuted}`}>
                 Clone Repository:
               </span>
-              <div className="flex items-center gap-1.5 bg-black/40 p-1.5 rounded-lg font-mono text-[11px] text-slate-300 border border-white/5">
+              <div className="flex items-center gap-1.5 bg-black/40 p-1.5 font-mono text-[11px] text-slate-300 border border-white/5">
                 <span className="truncate flex-1 select-all">{cloneUrl}</span>
                 <button
                   onClick={handleCopyClone}
@@ -237,16 +215,16 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
           </div>
         </div>
 
-        <div className={`relative z-10 mt-6 rounded-xl border bg-black/20 p-3 ${currentTheme.border}`}>
+        <div className={`relative z-10 mt-6 border bg-black/20 p-3 ${currentTheme.border}`}>
           <div className="mb-2 flex items-center justify-between gap-2">
             <h4 className={`text-xs font-semibold tracking-wide ${currentTheme.textMain}`}>
               Architecture Diagram
             </h4>
-            <div className="flex rounded-lg border border-white/10 bg-black/20 p-0.5 text-[10px] font-medium">
+            <div className="flex border border-white/10 bg-black/20 p-0.5 text-[10px] font-medium">
               <button
                 type="button"
                 onClick={() => setDiagramView('mermaid')}
-                className={`flex items-center gap-1 rounded-md px-2 py-1 transition ${diagramView === 'mermaid' ? 'bg-indigo-500 text-white' : currentTheme.textMuted}`}
+                className={`flex items-center gap-1 px-2 py-1 transition ${diagramView === 'mermaid' ? 'bg-[#eab308] text-slate-950' : currentTheme.textMuted}`}
                 aria-pressed={diagramView === 'mermaid'}
               >
                 <Code2 className="w-3 h-3" /> Mermaid
@@ -254,7 +232,7 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
               <button
                 type="button"
                 onClick={() => setDiagramView('web')}
-                className={`flex items-center gap-1 rounded-md px-2 py-1 transition ${diagramView === 'web' ? 'bg-indigo-500 text-white' : currentTheme.textMuted}`}
+                className={`flex items-center gap-1 px-2 py-1 transition ${diagramView === 'web' ? 'bg-[#eab308] text-slate-950' : currentTheme.textMuted}`}
                 aria-pressed={diagramView === 'web'}
               >
                 <Workflow className="w-3 h-3" /> Interactive
@@ -275,8 +253,8 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
 
         {/* Live Metrics Grid Footer */}
         <div className={`mt-6 pt-5 border-t grid grid-cols-2 sm:grid-cols-4 gap-3 ${currentTheme.border}`}>
-          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-black/10 border border-white/5">
-            <div className="p-2 rounded-lg bg-amber-500/10 text-amber-400 border border-amber-500/20">
+          <div className="flex items-center gap-3 p-2.5 bg-black/10 border border-white/5">
+            <div className="p-2 bg-amber-500/10 text-amber-400 border border-amber-500/20">
               <Star className="w-4 h-4" />
             </div>
             <div>
@@ -287,8 +265,8 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-black/10 border border-white/5">
-            <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+          <div className="flex items-center gap-3 p-2.5 bg-black/10 border border-white/5">
+            <div className="p-2 bg-[#eab308]/10 text-[#eab308] border border-[#eab308]/20">
               <GitFork className="w-4 h-4" />
             </div>
             <div>
@@ -299,8 +277,8 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-black/10 border border-white/5">
-            <div className="p-2 rounded-lg bg-rose-500/10 text-rose-400 border border-rose-500/20">
+          <div className="flex items-center gap-3 p-2.5 bg-black/10 border border-white/5">
+            <div className="p-2 bg-rose-500/10 text-rose-400 border border-rose-500/20">
               <Bug className="w-4 h-4" />
             </div>
             <div>
@@ -311,8 +289,8 @@ export const RepositoryHeroCard: React.FC<RepositoryHeroCardProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-black/10 border border-white/5">
-            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          <div className="flex items-center gap-3 p-2.5 bg-black/10 border border-white/5">
+            <div className="p-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <Calendar className="w-4 h-4" />
             </div>
             <div>

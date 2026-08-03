@@ -52,7 +52,7 @@ export const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ readmeText, repoFull
       {/* Header bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-3.5 bg-slate-950 border-b border-slate-800">
         <div className="flex items-center gap-2">
-          <BookOpen className="w-4 h-4 text-indigo-400" />
+          <BookOpen className="w-4 h-4 text-[#eab308]" />
           <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">
             README.md
           </h3>
@@ -60,11 +60,11 @@ export const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ readmeText, repoFull
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex bg-slate-900 border border-slate-800 p-0.5 rounded-lg text-xs">
+          <div className="flex bg-slate-900 border border-slate-800 p-0.5 text-xs">
             <button
               onClick={() => setViewMode('rendered')}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 ${
-                viewMode === 'rendered' ? 'bg-indigo-600 text-white font-medium' : 'text-slate-400 hover:text-slate-200'
+              className={`px-2.5 py-1 transition-all flex items-center gap-1.5 ${
+                viewMode === 'rendered' ? 'bg-[#eab308] text-slate-950 font-medium' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <FileText className="w-3.5 h-3.5" />
@@ -72,8 +72,8 @@ export const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ readmeText, repoFull
             </button>
             <button
               onClick={() => setViewMode('raw')}
-              className={`px-2.5 py-1 rounded-md transition-all flex items-center gap-1.5 ${
-                viewMode === 'raw' ? 'bg-indigo-600 text-white font-medium' : 'text-slate-400 hover:text-slate-200'
+              className={`px-2.5 py-1 transition-all flex items-center gap-1.5 ${
+                viewMode === 'raw' ? 'bg-[#eab308] text-slate-950 font-medium' : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               <Code className="w-3.5 h-3.5" />
@@ -83,7 +83,7 @@ export const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ readmeText, repoFull
 
           <button
             onClick={handleCopyRaw}
-            className="p-1.5 hover:bg-slate-800 text-slate-300 rounded-lg transition-colors border border-slate-800"
+            className="p-1.5 hover:bg-slate-800 text-slate-300 transition-colors border border-slate-800"
             title="Copy Raw README text"
           >
             {copiedRaw ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
@@ -98,7 +98,7 @@ export const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ readmeText, repoFull
         {toc.length > 2 && viewMode === 'rendered' && (
           <aside className="lg:col-span-1 p-4 bg-slate-950/50 border-b lg:border-b-0 lg:border-r border-slate-800/80 max-h-96 overflow-y-auto">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-300 mb-3 uppercase tracking-wider">
-              <List className="w-3.5 h-3.5 text-indigo-400" />
+              <List className="w-3.5 h-3.5 text-[#eab308]" />
               <span>Outline</span>
             </div>
             <ul className="space-y-1.5 text-xs">
@@ -109,7 +109,7 @@ export const ReadmeViewer: React.FC<ReadmeViewerProps> = ({ readmeText, repoFull
                 >
                   <a
                     href={`#${heading.id}`}
-                    className="text-slate-400 hover:text-indigo-400 block truncate transition-colors"
+                    className="text-slate-400 hover:text-[#eab308] block truncate transition-colors"
                   >
                     {heading.text}
                   </a>

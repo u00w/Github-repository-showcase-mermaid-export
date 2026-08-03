@@ -233,10 +233,10 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
   );
 
   return (
-    <article className="p-5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 max-w-4xl shadow-xl space-y-5">
+    <article className="p-5 bg-slate-900 border border-slate-800 text-slate-100 max-w-4xl shadow-xl space-y-5">
       <header className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <img src={data.repo.ownerAvatarUrl} alt={data.repo.owner} className="w-10 h-10 rounded-xl border border-slate-700" />
+          <img src={data.repo.ownerAvatarUrl} alt={data.repo.owner} className="w-10 h-10 border border-slate-700" />
           <div>
             <h3 className="font-bold text-base text-white">{data.repo.fullName}</h3>
             <p className="text-xs text-slate-400">{data.repo.owner}</p>
@@ -246,7 +246,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
           href={data.repo.htmlUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold"
+          className="px-3 py-1.5 bg-[#eab308] hover:bg-[#facc15] text-slate-950 text-xs font-semibold"
         >
           View on GitHub
         </a>
@@ -256,23 +256,23 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 
       <div className="flex flex-wrap items-center gap-2">
         {data.repo.topics.map((topic) => (
-          <span key={topic} className="px-2 py-0.5 rounded-md text-[11px] bg-slate-800 border border-slate-700 text-slate-300">
+          <span key={topic} className="px-2 py-0.5 text-[11px] bg-slate-800 border border-slate-700 text-slate-300">
             #{topic}
           </span>
         ))}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-        <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">⭐ {data.repo.stars.toLocaleString()}</div>
-        <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">🍴 {data.repo.forks.toLocaleString()}</div>
-        <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">🐞 {data.repo.openIssues.toLocaleString()}</div>
-        <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-indigo-300">{data.repo.primaryLanguage}</div>
+        <div className="border border-slate-800 bg-slate-950/60 px-3 py-2">⭐ {data.repo.stars.toLocaleString()}</div>
+        <div className="border border-slate-800 bg-slate-950/60 px-3 py-2">🍴 {data.repo.forks.toLocaleString()}</div>
+        <div className="border border-slate-800 bg-slate-950/60 px-3 py-2">🐞 {data.repo.openIssues.toLocaleString()}</div>
+        <div className="border border-slate-800 bg-slate-950/60 px-3 py-2 text-[#eab308]">{data.repo.primaryLanguage}</div>
       </div>
 
-      <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+      <section className="border border-slate-800 bg-slate-950/60 p-4 space-y-3">
         <div className="flex items-center justify-between gap-2">
           <h4 className="text-sm font-semibold text-white">Architecture Diagrams</h4>
-          <div className="flex flex-wrap gap-1 rounded-lg border border-slate-800 bg-slate-900 p-1 text-[11px]">
+          <div className="flex flex-wrap gap-1 border border-slate-800 bg-slate-900 p-1 text-[11px]">
             {[
               ['mermaid', 'Mermaid'],
               ['web', 'Interactive Web'],
@@ -292,16 +292,16 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         {activeDiagram === 'mermaid' && (
           <div className="space-y-2">
             {mermaidError && (
-              <p className="text-xs text-rose-300 bg-rose-950/40 border border-rose-800 rounded-lg p-2">
+              <p className="text-xs text-rose-300 bg-rose-950/40 border border-rose-800 p-2">
                 Mermaid render failed: {mermaidError}
               </p>
             )}
-            <div ref={mermaidContainerRef} className="w-full overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 text-slate-100 p-2" />
+            <div ref={mermaidContainerRef} className="w-full overflow-x-auto border border-slate-700 bg-slate-950 text-slate-100 p-2" />
           </div>
         )}
 
         {activeDiagram === 'web' && (
-          <div className="rounded-lg border border-slate-700 bg-slate-900/70 p-3 text-xs text-slate-300 space-y-3">
+          <div className="border border-slate-700 bg-slate-900/70 p-3 text-xs text-slate-300 space-y-3">
             {typeof renderWebArchitecture === 'function' ? (
               renderWebArchitecture({
                 classes: data.diagrams.classes,
@@ -315,7 +315,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
                     <button
                       key={item.id}
                       type="button"
-                      className="text-left px-2.5 py-2 rounded-md border border-slate-700 bg-slate-950/60 hover:border-indigo-500 hover:bg-slate-900 transition"
+                      className="text-left px-2.5 py-2 border border-slate-700 bg-slate-950/60 hover:border-[#eab308] hover:bg-slate-900 transition"
                     >
                       <p className="text-slate-100 font-medium truncate">{item.name}</p>
                       <p className="text-[11px] text-slate-400">{item.stereotype || 'class'} • {item.packageName || 'root'}</p>
@@ -328,7 +328,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         )}
       </section>
 
-      <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+      <section className="border border-slate-800 bg-slate-950/60 p-4 space-y-3">
         <h4 className="text-sm font-semibold text-white">Language Composition &amp; Tech Stack</h4>
         <div className="space-y-2">
           {data.languages.map((language) => {
@@ -348,20 +348,20 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         </div>
 
         <div className="flex flex-wrap gap-2 pt-1">
-          <span className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Primary: {data.repo.primaryLanguage}</span>
-          <span className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">License: {data.repo.license}</span>
-          <span className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Branch: {data.repo.defaultBranch}</span>
+          <span className="px-2 py-1 bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Primary: {data.repo.primaryLanguage}</span>
+          <span className="px-2 py-1 bg-slate-800 border border-slate-700 text-[11px] text-slate-300">License: {data.repo.license}</span>
+          <span className="px-2 py-1 bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Branch: {data.repo.defaultBranch}</span>
         </div>
       </section>
 
-      <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-2">
+      <section className="border border-slate-800 bg-slate-950/60 p-4 space-y-2">
         <h4 className="text-sm font-semibold text-white">Repository Structure ({data.repo.defaultBranch})</h4>
-        <pre className="text-[11px] leading-relaxed text-slate-300 font-mono bg-slate-950 border border-slate-800 rounded-lg p-3 overflow-x-auto">
+        <pre className="text-[11px] leading-relaxed text-slate-300 font-mono bg-slate-950 border border-slate-800 p-3 overflow-x-auto">
 {data.treeLines.join('\\n')}
         </pre>
       </section>
 
-      <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+      <section className="border border-slate-800 bg-slate-950/60 p-4 space-y-3">
         <h4 className="text-sm font-semibold text-white">Top Contributors</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
           {data.contributors.map((contributor) => (
@@ -370,7 +370,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
               href={contributor.htmlUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-indigo-500 transition"
+              className="flex items-center gap-2 border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-[#eab308] transition"
             >
               <img src={contributor.avatarUrl} alt={contributor.login} className="w-7 h-7 rounded-full border border-slate-700" />
               <div className="min-w-0">
@@ -397,55 +397,55 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       const pct = total > 0 ? Math.round((item.bytes / total) * 100) : 0;
       return `<div class="space-y-1">
   <div class="flex items-center justify-between text-xs text-slate-300"><span>${escHtml(item.name)}</span><span>${pct}%</span></div>
-  <div class="h-2 rounded-full bg-slate-800 overflow-hidden"><div class="h-full bg-indigo-500" style="width:${pct}%"></div></div>
+  <div class="h-2 bg-slate-800 overflow-hidden"><div class="h-full bg-[#eab308]" style="width:${pct}%"></div></div>
 </div>`;
     }).join('\n');
     const treeRows = cardData.treeLines.map((path) => escHtml(path)).join('\n');
-    const contributorRows = cardData.contributors.map((contributor) => `<a href="${escAttr(contributor.htmlUrl)}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-indigo-500 transition">
-  <img src="${escAttr(contributor.avatarUrl)}" alt="${escAttr(contributor.login)}" class="w-7 h-7 rounded-full border border-slate-700" />
+    const contributorRows = cardData.contributors.map((contributor) => `<a href="${escAttr(contributor.htmlUrl)}" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-[#eab308] transition">
+  <img src="${escAttr(contributor.avatarUrl)}" alt="${escAttr(contributor.login)}" class="w-7 h-7 border border-slate-700" />
   <div class="min-w-0">
     <p class="text-xs text-slate-100 truncate">${escHtml(contributor.login)}</p>
     <p class="text-[11px] text-slate-400">${Number(contributor.contributions).toLocaleString()} contributions</p>
   </div>
 </a>`).join('\n');
     return `<!-- GitHub Repository Showcase Card (Tailwind-only markup) -->
-<article class="p-5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 max-w-4xl shadow-xl space-y-5">
+<article class="p-5 bg-slate-900 border border-slate-800 text-slate-100 max-w-4xl shadow-xl space-y-5">
   <header class="flex items-start justify-between gap-4">
     <div class="flex items-center gap-3">
-      <img src="${escAttr(cardData.repo.ownerAvatarUrl)}" alt="${escAttr(cardData.repo.owner)}" class="w-10 h-10 rounded-xl border border-slate-700" />
+      <img src="${escAttr(cardData.repo.ownerAvatarUrl)}" alt="${escAttr(cardData.repo.owner)}" class="w-10 h-10 border border-slate-700" />
       <div>
         <h3 class="font-bold text-base text-white">${escHtml(cardData.repo.fullName)}</h3>
         <p class="text-xs text-slate-400">${escHtml(cardData.repo.owner)}</p>
       </div>
     </div>
-    <a href="${escAttr(cardData.repo.htmlUrl)}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold">View on GitHub</a>
+    <a href="${escAttr(cardData.repo.htmlUrl)}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-[#eab308] hover:bg-[#facc15] text-slate-950 text-xs font-semibold">View on GitHub</a>
   </header>
   <p class="text-xs text-slate-300 leading-relaxed">${escHtml(cardData.repo.description)}</p>
   <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
-    <div class="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">⭐ ${cardData.repo.stars.toLocaleString()}</div>
-    <div class="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">🍴 ${cardData.repo.forks.toLocaleString()}</div>
-    <div class="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2">🐞 ${cardData.repo.openIssues.toLocaleString()}</div>
-    <div class="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-indigo-300">${escHtml(cardData.repo.primaryLanguage)}</div>
+    <div class="border border-slate-800 bg-slate-950/60 px-3 py-2">⭐ ${cardData.repo.stars.toLocaleString()}</div>
+    <div class="border border-slate-800 bg-slate-950/60 px-3 py-2">🍴 ${cardData.repo.forks.toLocaleString()}</div>
+    <div class="border border-slate-800 bg-slate-950/60 px-3 py-2">🐞 ${cardData.repo.openIssues.toLocaleString()}</div>
+    <div class="border border-slate-800 bg-slate-950/60 px-3 py-2 text-[#eab308]">${escHtml(cardData.repo.primaryLanguage)}</div>
   </div>
-  <section class="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+  <section class="border border-slate-800 bg-slate-950/60 p-4 space-y-3">
     <h4 class="text-sm font-semibold text-white">Architecture Diagrams</h4>
     <p class="text-xs text-slate-400">For interactive tabs + Mermaid rendering, pair this with the JavaScript export.</p>
-    <pre class="text-[11px] text-slate-200 bg-slate-950 border border-slate-800 rounded-lg p-3 overflow-x-auto">${escHtml(cardData.diagrams.mermaidCode)}</pre>
+    <pre class="text-[11px] text-slate-200 bg-slate-950 border border-slate-800 p-3 overflow-x-auto">${escHtml(cardData.diagrams.mermaidCode)}</pre>
   </section>
-  <section class="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+  <section class="border border-slate-800 bg-slate-950/60 p-4 space-y-3">
     <h4 class="text-sm font-semibold text-white">Language Composition &amp; Tech Stack</h4>
     <div class="space-y-2">${languageRows}</div>
     <div class="flex flex-wrap gap-2 pt-1">
-      <span class="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Primary: ${escHtml(cardData.repo.primaryLanguage)}</span>
-      <span class="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">License: ${escHtml(cardData.repo.license)}</span>
-      <span class="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Branch: ${escHtml(cardData.repo.defaultBranch)}</span>
+      <span class="px-2 py-1 bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Primary: ${escHtml(cardData.repo.primaryLanguage)}</span>
+      <span class="px-2 py-1 bg-slate-800 border border-slate-700 text-[11px] text-slate-300">License: ${escHtml(cardData.repo.license)}</span>
+      <span class="px-2 py-1 bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Branch: ${escHtml(cardData.repo.defaultBranch)}</span>
     </div>
   </section>
-  <section class="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-2">
+  <section class="border border-slate-800 bg-slate-950/60 p-4 space-y-2">
     <h4 class="text-sm font-semibold text-white">Repository Structure (${escHtml(cardData.repo.defaultBranch)})</h4>
-    <pre class="text-[11px] leading-relaxed text-slate-300 font-mono bg-slate-950 border border-slate-800 rounded-lg p-3 overflow-x-auto">${treeRows}</pre>
+    <pre class="text-[11px] leading-relaxed text-slate-300 font-mono bg-slate-950 border border-slate-800 p-3 overflow-x-auto">${treeRows}</pre>
   </section>
-  <section class="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+  <section class="border border-slate-800 bg-slate-950/60 p-4 space-y-3">
     <h4 class="text-sm font-semibold text-white">Top Contributors</h4>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">${contributorRows}</div>
   </section>
@@ -722,6 +722,13 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       return { color: '#818cf8', bg: '#0f172a', border: '#475569' };
     }
 
+    function relationshipId(rel, routeIndex) {
+      var fallbackParts = [rel.fromId, rel.toId, rel.type, rel.label, routeIndex].filter(function (value) {
+        return value !== undefined && value !== null && value !== '';
+      });
+      return rel.id || fallbackParts.join('-');
+    }
+
     function orthPath(from, to, routeIndex) {
       var leftToRight = to.x >= from.x;
       var startX = from.x + (leftToRight ? nodeWidth / 2 : -nodeWidth / 2);
@@ -775,7 +782,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
         var label = esc(rel.label || rel.type || 'relation');
         var dashed = rel.type === 'dependency' || rel.type === 'realization';
         var boxW = label.length * 5.8 + 12;
-        return '<g>' +
+        return '<g data-relationship-id="' + relationshipId(rel, idx) + '" data-relationship-id="' + relationshipId(rel, idx) + '">' +
           '<path d="' + route.d + '" fill="none" stroke="#020617" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>' +
           '<path d="' + route.d + '" fill="none" stroke="' + style.color + '" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"' + (dashed ? ' stroke-dasharray="5 4"' : '') + ' marker-end="url(#repo-card-arch-arrow)"></path>' +
           '<rect x="' + (route.labelX - boxW / 2) + '" y="' + (route.labelY - 7) + '" width="' + boxW + '" height="14" rx="4" fill="' + style.bg + '" stroke="' + style.border + '"></rect>' +
@@ -790,7 +797,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       (cls.attributes || []).forEach(function (a) { members.push('<p class="repo-card__web-node-member">' + esc(a) + '</p>'); });
       (cls.methods || []).forEach(function (m) { members.push('<p class="repo-card__web-node-member">' + esc(m) + '</p>'); });
       var href = 'https://github.com/' + data.repo.fullName + '/search?q=' + encodeURIComponent(cls.name) + '&type=code';
-      return '<a class="repo-card__web-node" href="' + href + '" target="_blank" rel="noopener noreferrer" title="Find ' + esc(cls.name) + ' in this repository on GitHub" style="left:' + pos.x + 'px;top:' + pos.y + 'px;height:' + pos.height + 'px;">' +
+      return '<a class="repo-card__web-node" href="' + href + '" target="_blank" rel="noopener noreferrer" title="Find ' + esc(cls.name) + ' in this repository on GitHub" style="left:' + pos.x + 'px;top:' + pos.y + 'px;height:' + pos.height + 'px;background:#6a1a41;">' +
         '<p class="repo-card__web-node-stereo">«' + esc(cls.stereotype || 'class') + '»</p>' +
         '<div class="repo-card__web-node-title"><span class="repo-card__web-node-name">' + esc(cls.name) + '</span><span class="repo-card__web-node-link">↗</span></div>' +
         (members.length ? '<div class="repo-card__web-node-members">' + members.join('') + '</div>' : '') +
@@ -1402,7 +1409,7 @@ ${js}
           if (!from || !to) return [];
           const route = createOrthogonalPath(from, to, index);
           return [{
-            id: relationship.id,
+            id: relationship.id || [relationship.fromId, relationship.toId, relationship.type, relationship.label, index].filter(Boolean).join('-'),
             path: route.path,
             labelX: route.labelX,
             labelY: route.labelY,
@@ -1421,14 +1428,14 @@ ${js}
               <span>Hybrid React renderer. Branch: {defaultBranch}. Connectors and lanes match the in-app architecture logic.</span>
             </div>
             <div className="flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900 p-1 text-[11px] text-slate-300">
-              <button type="button" onClick={zoomOut} className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Zoom out web architecture diagram" title="Zoom out">
+              <button type="button" onClick={zoomOut} className="p-1.5 transition hover:bg-slate-800 hover:text-[#eab308]" aria-label="Zoom out web architecture diagram" title="Zoom out">
                 <span aria-hidden="true">-</span>
               </button>
               <span className="min-w-12 px-1 text-center font-mono">{Math.round(contentScale * 100)}%</span>
-              <button type="button" onClick={zoomIn} className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Zoom in web architecture diagram" title="Zoom in">
+              <button type="button" onClick={zoomIn} className="p-1.5 transition hover:bg-slate-800 hover:text-[#eab308]" aria-label="Zoom in web architecture diagram" title="Zoom in">
                 <span aria-hidden="true">+</span>
               </button>
-              <button type="button" onClick={resetZoom} className="rounded-md p-1.5 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Reset web architecture zoom" title="Reset zoom">
+              <button type="button" onClick={resetZoom} className="p-1.5 transition hover:bg-slate-800 hover:text-[#eab308]" aria-label="Reset web architecture zoom" title="Reset zoom">
                 ↺
               </button>
             </div>
@@ -1436,65 +1443,65 @@ ${js}
 
           <div ref={frameRef} className="w-full overflow-auto" style={{ maxHeight: '78vh', backgroundColor: DIAGRAM_THEME.background }}>
             <div style={{ width: 1280 * contentScale, height: canvasHeight * contentScale }}>
-            <div className="relative w-[1280px]" style={{ height: canvasHeight, transform: 'scale(' + contentScale + ')', transformOrigin: 'top left' }}>
-              <div className="absolute inset-x-0 top-2 grid grid-cols-4 px-4 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: DIAGRAM_THEME.headerText }}>
-                {GROUPS.map((group) => <span key={group.name}>{group.name}</span>)}
-              </div>
+              <div className="relative w-[1280px]" style={{ height: canvasHeight, transform: 'scale(' + contentScale + ')', transformOrigin: 'top left' }}>
+                <div className="absolute inset-x-0 top-2 grid grid-cols-4 px-4 text-center text-[10px] font-semibold uppercase tracking-wider" style={{ color: DIAGRAM_THEME.headerText }}>
+                  {GROUPS.map((group) => <span key={group.name}>{group.name}</span>)}
+                </div>
 
-              <svg className="absolute inset-0 pointer-events-none" width={canvasSize.width} height={canvasSize.height} aria-hidden="true">
-                <defs>
-                  <marker id="architecture-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-                    <path d="M0,0 L0,6 L6,3 z" fill="context-stroke" />
-                  </marker>
-                </defs>
-                {connections.map((connection) => (
-                  <g key={connection.id}>
-                    <path d={connection.path} fill="none" stroke={DIAGRAM_THEME.connectorShadow} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d={connection.path} fill="none" stroke={connection.color} strokeWidth="1.5" strokeDasharray={connection.dashed ? '5 4' : undefined}
-                      strokeLinecap="round" strokeLinejoin="round" opacity="0.8" markerEnd="url(#architecture-arrow)" />
-                    <rect
-                      x={connection.labelX - (String(connection.label).length * 2.9 + 5)}
-                      y={connection.labelY - 7}
-                      width={String(connection.label).length * 5.8 + 10}
-                      height="14"
-                      rx="4"
-                      fill={connection.labelBackground}
-                      stroke={connection.labelBorder}
-                    />
-                    <text x={connection.labelX} y={connection.labelY} textAnchor="middle" dominantBaseline="middle" className="text-[9px]" style={{ fill: DIAGRAM_THEME.labelText }}>
-                      {connection.label}
-                    </text>
-                  </g>
-                ))}
-              </svg>
-              </div>
-              </div>
-              {classes.map((umlClass) => {
-                const position = positions[umlClass.id];
-                const members = [...(umlClass.attributes || []), ...(umlClass.methods || [])];
-                return (
-                  <a
-                    key={umlClass.id}
-                    href={'https://github.com/' + repoFullName + '/search?q=' + encodeURIComponent(umlClass.name) + '&type=code'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={'Find ' + umlClass.name + ' in this repository on GitHub'}
-                    className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 border shadow-md shadow-black/20 transition hover:z-20"
-                    style={{ left: (position.x * 100) + '%', top: position.y + 'px', borderColor: DIAGRAM_THEME.nodeBorder, backgroundColor: DIAGRAM_THEME.nodeFill, color: DIAGRAM_THEME.nodeText }}
-                  >
-                    <p className="px-2.5 pt-2 text-[9px] uppercase tracking-wider" style={{ color: DIAGRAM_THEME.labelText }}>«{umlClass.stereotype || 'class'}»</p>
-                    <div className="mt-1 flex items-center gap-1.5 border-y px-2.5 py-1.5" style={{ borderColor: DIAGRAM_THEME.nodeBorder }}>
-                      <span className="truncate text-xs font-bold" style={{ color: DIAGRAM_THEME.nodeText }}>{umlClass.name}</span>
-                      <span className="text-[10px]" style={{ color: DIAGRAM_THEME.labelText }}>↗</span>
-                    </div>
-                    {members.length > 0 && (
-                      <div className="space-y-0.5 px-2.5 py-2 font-mono text-[9px] leading-[1.35]" style={{ color: DIAGRAM_THEME.nodeText }}>
-                        {members.map((line, idx) => <p key={idx} className="break-words">{line}</p>)}
+                <svg className="absolute inset-0 pointer-events-none" width={canvasSize.width} height={canvasSize.height} aria-hidden="true">
+                  <defs>
+                    <marker id="architecture-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+                      <path d="M0,0 L0,6 L6,3 z" fill="context-stroke" />
+                    </marker>
+                  </defs>
+                  {connections.map((connection) => (
+                    <g key={connection.id}>
+                      <path d={connection.path} fill="none" stroke={DIAGRAM_THEME.connectorShadow} strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d={connection.path} fill="none" stroke={connection.color} strokeWidth="1.5" strokeDasharray={connection.dashed ? '5 4' : undefined}
+                        strokeLinecap="round" strokeLinejoin="round" opacity="0.8" markerEnd="url(#architecture-arrow)" />
+                      <rect
+                        x={connection.labelX - (String(connection.label).length * 2.9 + 5)}
+                        y={connection.labelY - 7}
+                        width={String(connection.label).length * 5.8 + 10}
+                        height="14"
+                        rx="4"
+                        fill={connection.labelBackground}
+                        stroke={connection.labelBorder}
+                      />
+                      <text x={connection.labelX} y={connection.labelY} textAnchor="middle" dominantBaseline="middle" className="text-[9px]" style={{ fill: DIAGRAM_THEME.labelText }}>
+                        {connection.label}
+                      </text>
+                    </g>
+                  ))}
+                </svg>
+
+                {classes.map((umlClass) => {
+                  const position = positions[umlClass.id];
+                  const members = [...(umlClass.attributes || []), ...(umlClass.methods || [])];
+                  return (
+                    <a
+                      key={umlClass.id}
+                      href={'https://github.com/' + repoFullName + '/search?q=' + encodeURIComponent(umlClass.name) + '&type=code'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title={'Find ' + umlClass.name + ' in this repository on GitHub'}
+                      className="absolute z-10 w-52 -translate-x-1/2 -translate-y-1/2 border shadow-md shadow-black/20 transition hover:z-20"
+                      style={{ left: (position.x * 100) + '%', top: position.y + 'px', borderColor: DIAGRAM_THEME.nodeBorder, backgroundColor: DIAGRAM_THEME.nodeFill, color: DIAGRAM_THEME.nodeText }}
+                    >
+                      <p className="px-2.5 pt-2 text-[9px] uppercase tracking-wider" style={{ color: DIAGRAM_THEME.labelText }}>«{umlClass.stereotype || 'class'}»</p>
+                      <div className="mt-1 flex items-center gap-1.5 border-y px-2.5 py-1.5" style={{ borderColor: DIAGRAM_THEME.nodeBorder }}>
+                        <span className="truncate text-xs font-bold" style={{ color: DIAGRAM_THEME.nodeText }}>{umlClass.name}</span>
+                        <span className="text-[10px]" style={{ color: DIAGRAM_THEME.labelText }}>↗</span>
                       </div>
-                    )}
-                  </a>
-                );
-              })}
+                      {members.length > 0 && (
+                        <div className="space-y-0.5 px-2.5 py-2 font-mono text-[9px] leading-[1.35]" style={{ color: DIAGRAM_THEME.nodeText }}>
+                          {members.map((line, idx) => <p key={idx} className="break-words">{line}</p>)}
+                        </div>
+                      )}
+                    </a>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -1563,20 +1570,20 @@ ${js}
 
       return (
         <main className="max-w-6xl mx-auto">
-          <article className="p-5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-100 shadow-xl space-y-5">
+          <article className="p-5 bg-slate-900 border border-slate-800 text-slate-100 shadow-xl space-y-5">
             <div className="flex justify-end">
-              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-yellow-300 hover:text-yellow-200">View on GitHub</a>
+              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-[#eab308] hover:bg-[#facc15] text-slate-950 text-xs font-semibold">View on GitHub</a>
             </div>
 
             <header className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3">
-                <img src={data.repo.ownerAvatarUrl} alt={data.repo.owner} className="w-10 h-10 rounded-xl border border-slate-700" />
+                <img src={data.repo.ownerAvatarUrl} alt={data.repo.owner} className="w-10 h-10 border border-slate-700" />
                 <div>
                   <h2 className="font-bold text-base text-white">{data.repo.fullName}</h2>
                   <p className="text-xs text-slate-400">{data.repo.owner}</p>
                 </div>
               </div>
-              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-yellow-500 hover:bg-yellow-400 text-slate-950 text-xs font-semibold">Open Repository</a>
+              <a href={data.repo.htmlUrl} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 bg-[#eab308] hover:bg-[#facc15] text-slate-950 text-xs font-semibold">Open Repository</a>
             </header>
 
             <p className="text-xs text-slate-300 leading-relaxed">{data.repo.description}</p>
@@ -1594,18 +1601,18 @@ ${js}
               <div className="rounded-lg border border-slate-800 bg-slate-950/60 px-3 py-2 text-yellow-300">{data.repo.primaryLanguage}</div>
             </div>
 
-            <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+            <section className="border border-slate-800 bg-slate-950/60 p-4 space-y-3">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="text-sm font-semibold text-white">Architecture Diagrams</h3>
-                <div className="flex gap-1 rounded-lg border border-slate-800 bg-slate-900 p-1 text-[11px]">
+                <div className="flex gap-1 border border-slate-800 bg-slate-900 p-1 text-[11px]">
                   {[['mermaid', 'Mermaid'], ['web', 'Interactive Web']].map(([key, label]) => (
                     <button
                       key={key}
                       type="button"
                       onClick={() => setActiveDiagram(key)}
                       className={
-                        'px-2.5 py-1 rounded-md transition ' +
-                        (activeDiagram === key ? 'bg-yellow-500 text-slate-950' : 'text-slate-400 hover:text-slate-200')
+                        'px-2.5 py-1 transition ' +
+                        (activeDiagram === key ? 'bg-[#eab308] text-slate-950' : 'text-slate-400 hover:text-slate-200')
                       }
                     >
                       {label}
@@ -1616,17 +1623,17 @@ ${js}
 
               {activeDiagram === 'mermaid' && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2 rounded-lg border border-slate-800 bg-slate-900 px-3 py-2 text-[11px] text-slate-300">
+                  <div className="flex items-center justify-between gap-2 border border-slate-800 bg-slate-900 px-3 py-2 text-[11px] text-slate-300">
                     <span>Scroll to navigate the diagram canvas.</span>
                     <div className="flex items-center gap-1">
-                      <button type="button" onClick={zoomOutMermaid} className="rounded-md border border-slate-700 px-2 py-1 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Zoom out Mermaid diagram">-</button>
+                      <button type="button" onClick={zoomOutMermaid} className="border border-slate-700 px-2 py-1 transition hover:bg-slate-800 hover:text-[#eab308]" aria-label="Zoom out Mermaid diagram">-</button>
                       <span className="min-w-12 px-1 text-center font-mono">{Math.round(mermaidZoom * 100)}%</span>
-                      <button type="button" onClick={zoomInMermaid} className="rounded-md border border-slate-700 px-2 py-1 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Zoom in Mermaid diagram">+</button>
-                      <button type="button" onClick={resetMermaidZoom} className="rounded-md border border-slate-700 px-2 py-1 transition hover:bg-slate-800 hover:text-yellow-300" aria-label="Reset Mermaid zoom">↺</button>
+                      <button type="button" onClick={zoomInMermaid} className="border border-slate-700 px-2 py-1 transition hover:bg-slate-800 hover:text-[#eab308]" aria-label="Zoom in Mermaid diagram">+</button>
+                      <button type="button" onClick={resetMermaidZoom} className="border border-slate-700 px-2 py-1 transition hover:bg-slate-800 hover:text-[#eab308]" aria-label="Reset Mermaid zoom">↺</button>
                     </div>
                   </div>
-                  {mermaidError && <p className="text-xs text-rose-300 bg-rose-950/40 border border-rose-800 rounded-lg p-2">{mermaidError}</p>}
-                  <div ref={mermaidContainerRef} className="w-full overflow-auto rounded-lg border border-slate-700 bg-slate-950 text-slate-100 p-2" style={{ maxHeight: '72vh' }} />
+                  {mermaidError && <p className="text-xs text-rose-300 bg-rose-950/40 border border-rose-800 p-2">{mermaidError}</p>}
+                  <div ref={mermaidContainerRef} className="w-full overflow-auto border border-slate-700 bg-slate-950 text-slate-100 p-2" style={{ maxHeight: '72vh' }} />
                 </div>
               )}
 
@@ -1640,7 +1647,7 @@ ${js}
               )}
             </section>
 
-            <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+            <section className="border border-slate-800 bg-slate-950/60 p-4 space-y-3">
               <h3 className="text-sm font-semibold text-white">Language Composition &amp; Tech Stack</h3>
               <div className="space-y-2">
                 {data.languages.map((language) => {
@@ -1651,8 +1658,8 @@ ${js}
                         <span>{language.name}</span>
                         <span>{pct}%</span>
                       </div>
-                      <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
-                        <div className="h-full bg-yellow-500" style={{ width: pct + '%' }} />
+                      <div className="h-2 bg-slate-800 overflow-hidden">
+                        <div className="h-full bg-[#eab308]" style={{ width: pct + '%' }} />
                       </div>
                     </div>
                   );
@@ -1660,9 +1667,9 @@ ${js}
               </div>
 
               <div className="flex flex-wrap gap-2 pt-1">
-                <span className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Primary: {data.repo.primaryLanguage}</span>
-                <span className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">License: {data.repo.license}</span>
-                <span className="px-2 py-1 rounded-md bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Branch: {data.repo.defaultBranch}</span>
+                <span className="px-2 py-1 bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Primary: {data.repo.primaryLanguage}</span>
+                <span className="px-2 py-1 bg-slate-800 border border-slate-700 text-[11px] text-slate-300">License: {data.repo.license}</span>
+                <span className="px-2 py-1 bg-slate-800 border border-slate-700 text-[11px] text-slate-300">Branch: {data.repo.defaultBranch}</span>
               </div>
             </section>
 
@@ -1674,7 +1681,7 @@ ${js}
               />
             </section>
 
-            <section className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 space-y-3">
+            <section className="border border-slate-800 bg-slate-950/60 p-4 space-y-3">
               <h3 className="text-sm font-semibold text-white">Top Contributors</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                 {(data.contributors || []).map((contributor) => (
@@ -1683,9 +1690,9 @@ ${js}
                     href={contributor.htmlUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-yellow-500 transition"
+                    className="flex items-center gap-2 border border-slate-800 bg-slate-900/70 px-2.5 py-2 hover:border-[#eab308] transition"
                   >
-                    <img src={contributor.avatarUrl} alt={contributor.login} className="w-7 h-7 rounded-full border border-slate-700" />
+                    <img src={contributor.avatarUrl} alt={contributor.login} className="w-7 h-7 border border-slate-700" />
                     <div className="min-w-0">
                       <p className="text-xs text-slate-100 truncate">{contributor.login}</p>
                       <p className="text-[11px] text-slate-400">{Number(contributor.contributions || 0).toLocaleString()} contributions</p>
@@ -1771,10 +1778,10 @@ ${js}
   ];
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-4">
+    <div className="bg-slate-900/90 border border-slate-800 p-6 shadow-xl space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-800">
         <div className="flex items-center gap-2">
-          <Share2 className="w-5 h-5 text-indigo-400" />
+          <Share2 className="w-5 h-5 text-[#eab308]" />
           <div>
             <h3 className="text-sm font-semibold text-slate-100">
               Embed &amp; Export Code Snippet
@@ -1787,7 +1794,7 @@ ${js}
 
         <button
           onClick={handleCopy}
-          className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+          className="px-3.5 py-1.5 bg-[#eab308] hover:bg-[#facc15] text-slate-950 text-xs font-semibold flex items-center gap-1.5 transition-colors"
         >
           {copied ? (
             <>
@@ -1809,9 +1816,9 @@ ${js}
           <button
             key={tab.id}
             onClick={() => setEmbedType(tab.id)}
-            className={`px-3 py-1.5 text-xs font-medium rounded-xl border transition-all ${
+            className={`px-3 py-1.5 text-xs font-medium border transition-all ${
               embedType === tab.id
-                ? 'bg-indigo-600 text-white border-indigo-500'
+                ? 'bg-[#eab308] text-slate-950 border-[#eab308]'
                 : 'bg-slate-950/60 text-slate-400 border-slate-800 hover:text-slate-200'
             }`}
           >
@@ -1849,7 +1856,7 @@ ${js}
 
       {/* Code Display Area */}
       <div className="relative">
-        <pre className="font-mono text-xs text-slate-300 bg-slate-950 p-4 rounded-xl border border-slate-800/80 overflow-x-auto whitespace-pre-wrap leading-relaxed">
+        <pre className="font-mono text-xs text-slate-300 bg-slate-950 p-4 border border-slate-800/80 overflow-x-auto whitespace-pre-wrap leading-relaxed">
           {getCurrentSnippet()}
         </pre>
       </div>

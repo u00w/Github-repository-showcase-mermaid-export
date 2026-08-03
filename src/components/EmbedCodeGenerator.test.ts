@@ -37,6 +37,14 @@ test('HTML/CSS/JS exports include parity sections and functional diagram tabs', 
   assert.match(source, /Zoom out web architecture diagram/);
 });
 
+test('connector ids use a stable fallback when relationship ids are missing', () => {
+  assert.match(source, /relationship\.id \|\|/);
+  assert.match(source, /fromId/);
+  assert.match(source, /toId/);
+  assert.match(source, /relationship\.type/);
+  assert.match(source, /relationship\.label/);
+});
+
 test('iFrame and Markdown snippets include full-card parity guidance text', () => {
   assert.match(source, /Full-card parity: this iframe renders the complete repository showcase card from \/embed/);
   assert.match(source, /\*\*Full-card parity note:\*\* Markdown is badge-only/);
