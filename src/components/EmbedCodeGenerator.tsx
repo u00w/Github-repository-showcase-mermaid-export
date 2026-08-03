@@ -188,7 +188,19 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       if (!mermaidContainerRef.current) return;
       try {
         const mermaid = (await import('mermaid')).default;
-        mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'dark' });
+        mermaid.initialize({
+          startOnLoad: false,
+          securityLevel: 'strict',
+          theme: 'base',
+          themeVariables: {
+            background: '#0f172a',
+            primaryColor: '#d1d5db',
+            primaryTextColor: '#000000',
+            lineColor: '#cbd5e1',
+            tertiaryColor: '#e5e7eb',
+            tertiaryTextColor: '#000000',
+          },
+        });
         const renderId = 'repo-card-diagram-' + Math.random().toString(36).slice(2);
         const { svg } = await mermaid.render(renderId, data.diagrams.mermaidCode);
         if (!cancelled && mermaidContainerRef.current) {
@@ -281,7 +293,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
                 Mermaid render failed: {mermaidError}
               </p>
             )}
-            <div ref={mermaidContainerRef} className="w-full overflow-x-auto rounded-lg border border-slate-700 bg-white text-slate-900 p-2" />
+            <div ref={mermaidContainerRef} className="w-full overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 text-slate-100 p-2" />
           </div>
         )}
 
@@ -499,7 +511,7 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
 .repo-card__tab-btn.is-active { background: #4f46e5; color: #fff; border-color: #4f46e5; }
 .repo-card__diagram-pane { border: 1px solid #1e293b; background: #020617; border-radius: 10px; padding: 10px; }
 .repo-card__diagram-pane.is-hidden { display: none; }
-.repo-card__diagram-mermaid { overflow-x: auto; background: #fff; color: #0f172a; border-radius: 8px; padding: 8px; }
+.repo-card__diagram-mermaid { overflow-x: auto; background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 8px; }
 .repo-card__web-diagram { width: 100%; overflow-x: auto; }
 .repo-card__web-shell { border: 1px solid #334155; border-radius: 10px; background: rgba(2, 6, 23, 0.75); overflow: hidden; }
 .repo-card__web-legend { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid #1e293b; font-size: 10px; color: #94a3b8; }
@@ -819,7 +831,19 @@ export function GitHubRepoCard({ renderWebArchitecture } = {}) {
       return;
     }
     try {
-      window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'dark' });
+      window.mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: 'strict',
+        theme: 'base',
+        themeVariables: {
+          background: '#0f172a',
+          primaryColor: '#d1d5db',
+          primaryTextColor: '#000000',
+          lineColor: '#cbd5e1',
+          tertiaryColor: '#e5e7eb',
+          tertiaryTextColor: '#000000',
+        },
+      });
       var renderId = 'repo-card-mermaid-' + Math.random().toString(36).slice(2);
       window.mermaid.render(renderId, code).then(function (result) {
         container.innerHTML = result.svg;
@@ -1387,7 +1411,19 @@ ${js}
         }
 
         try {
-          window.mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme: 'dark' });
+          window.mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'strict',
+            theme: 'base',
+            themeVariables: {
+              background: '#0f172a',
+              primaryColor: '#d1d5db',
+              primaryTextColor: '#000000',
+              lineColor: '#cbd5e1',
+              tertiaryColor: '#e5e7eb',
+              tertiaryTextColor: '#000000',
+            },
+          });
           const renderId = 'hybrid-mermaid-' + Math.random().toString(36).slice(2);
           window.mermaid.render(renderId, data.diagrams.mermaidCode).then((result) => {
             if (!mermaidContainerRef.current) return;
@@ -1464,7 +1500,7 @@ ${js}
               {activeDiagram === 'mermaid' && (
                 <div className="space-y-2">
                   {mermaidError && <p className="text-xs text-rose-300 bg-rose-950/40 border border-rose-800 rounded-lg p-2">{mermaidError}</p>}
-                  <div ref={mermaidContainerRef} className="w-full overflow-x-auto rounded-lg border border-slate-700 bg-white text-slate-900 p-2" />
+                  <div ref={mermaidContainerRef} className="w-full overflow-x-auto rounded-lg border border-slate-700 bg-slate-950 text-slate-100 p-2" />
                 </div>
               )}
 

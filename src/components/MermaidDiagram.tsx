@@ -18,7 +18,15 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ chart, className
         mermaid.initialize({
           startOnLoad: false,
           securityLevel: 'strict',
-          theme: 'dark',
+          theme: 'base',
+          themeVariables: {
+            background: '#0f172a',
+            primaryColor: '#d1d5db',
+            primaryTextColor: '#000000',
+            lineColor: '#cbd5e1',
+            tertiaryColor: '#e5e7eb',
+            tertiaryTextColor: '#000000',
+          },
         });
 
         const renderId = `repo-architecture-${Math.random().toString(36).slice(2)}`;
@@ -70,7 +78,7 @@ export const MermaidDiagram: React.FC<MermaidDiagramProps> = ({ chart, className
     <div className={className}>
       <div
         ref={containerRef}
-        className="w-full overflow-x-auto rounded-lg border border-slate-300/40 bg-white text-slate-900"
+        className="w-full overflow-x-auto rounded-lg border border-slate-700/70 bg-slate-950 text-slate-100"
         aria-label="Repository architecture Mermaid diagram"
       />
     </div>
